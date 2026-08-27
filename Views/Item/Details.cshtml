@@ -1,0 +1,37 @@
+﻿@model CRUD.Models.Item
+
+<h2>Item Details</h2>
+
+<hr />
+
+<p>
+    <strong>ID :</strong>
+    @Model.ItemID
+</p>
+<p>
+    <strong>Item Code :</strong>
+    @Model.ItemCode
+</p>
+<p>
+    <strong>Item Name :</strong>
+    @Model.ItemName
+</p>
+
+<p>
+    <strong>Description :</strong>
+    @Model.Description
+</p>
+
+<p>
+    <strong>Amount :</strong>
+    @Model.Amount
+</p>
+
+<p>
+    <strong>Category ID :</strong>
+    @Model.Category
+</p>
+
+<a asp-action="Index" class="btn btn-primary">
+    Back
+</a>

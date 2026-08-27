@@ -1,0 +1,96 @@
+﻿@model List<CRUD.Models.Item>
+
+<div class="text-center mb-5">
+    <h2 class="fw-bold"> Items</h2>
+    <p class="text-muted">Manage boutique rental items.</p>
+    <hr style="width:120px; margin:auto;">
+</div>
+
+<form asp-action="Index" method="get">
+
+    <div class="row mb-3">
+
+        <div class="col-md-5">
+            <input type="text"
+                   name="searchString"
+                   class="form-control"
+                   placeholder=" Search item name..."
+                   value="@Context.Request.Query["searchString"]" />
+        </div>
+
+        <div class="col-md-4">
+            <select name="categoryId" class="form-select">
+                <option value="">-- All Categories --</option>
+
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.Value">
+                        @category.Text
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex justify-content-end gap-2">
+
+            <button type="submit" class="btn btn-primary">
+                Filter
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                Clear
+            </a>
+
+            <a asp-action="Create" class="btn btn-success">
+                Add Item
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Item Code</th>
+            <th>Item Name</th>
+            <th>Description</th>
+            <th>Size</th>
+            <th>Amount</th>
+            <th>Quantity</th>
+            <th>Category Name</th>
+            <th width="120">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>@item.ItemID</td>
+                <td><span class="badge bg-secondary">@item.ItemCode</span></td>
+                <td>@item.ItemName</td>
+                <td>@item.Description</td>
+                <td>@item.Size</td>
+                <td>₱ @item.Amount</td>
+                <td>@item.Quantity</td>
+                <td>@item.Category.CatName</td>
+
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-id="@item.ItemID"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>

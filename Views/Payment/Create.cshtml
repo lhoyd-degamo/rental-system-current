@@ -1,0 +1,267 @@
+﻿@model CRUD.Models.Borrow
+
+@{
+    ViewData["Title"] = "Payment Details";
+
+    decimal amount =
+        ViewBag.Amount != null
+            ? (decimal)ViewBag.Amount
+            : 0;
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header"
+             style="background-color:#D184A2;color:white;">
+
+            <h3 class="mb-0" style="color:white">
+                Payment Details
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- CUSTOMER -->
+
+            <h5 style="color:#C76C8C;">
+                Customer Information
+            </h5>
+
+            <div class="row mb-4">
+
+                <div class="col-md-6">
+
+                    <strong>
+                        Customer Name:
+                    </strong>
+
+                    <div>
+                        @(Model.Customer?.CustomerName ?? "N/A")
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <strong>
+                        Email:
+                    </strong>
+
+                    <div>
+                        @(Model.Customer?.Email ?? "N/A")
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <strong>
+                        Phone:
+                    </strong>
+
+                    <div>
+                        @(Model.Customer?.PhoneNumber ?? "N/A")
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <strong>
+                        Address:
+                    </strong>
+
+                    <div>
+                        @(Model.Customer?.Address ?? "N/A")
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ITEMS -->
+
+            <h5>
+                Rented Items
+            </h5>
+
+            <div class="table-responsive mb-4"">
+
+                <table class="table table-bordered"">
+
+                    <thead style="background-color: #D184A2">
+
+                        <tr>
+
+                            <th>
+                                Item Code
+                            </th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Size
+                            </th>
+
+                            <th>
+                                Price
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var borrowItem in Model.BorrowItems)
+                        {
+                            <tr>
+
+                                <td>
+                                    @borrowItem.Item?.ItemCode
+                                </td>
+
+                                <td>
+                                    @borrowItem.Item?.ItemName
+                                </td>
+
+                                <td>
+                                    @(borrowItem.Item?.Category?.CatName
+                                        ?? "No Category")
+                                </td>
+
+                                <td>
+                                    @borrowItem.Item?.Size
+                                </td>
+
+                                <td>
+                                    ₱@(borrowItem.Item?.Amount.ToString("N2"))
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr>
+
+                            <th colspan="4" class="text-end">
+                                Total
+                            </th>
+
+                            <th>
+                                ₱@amount.ToString("N2")
+                            </th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+
+            <!-- PAYMENT -->
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <h5 style="color:#C76C8C;">
+                        Payment
+                    </h5>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Payment Method
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="Cash"
+                                   readonly />
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Amount
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   value="₱@amount.ToString("N2")"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+                    <div class="alert alert-success">
+
+                        <strong>
+                            Payment will be recorded.
+                        </strong>
+
+                        <br />
+
+                    </div>
+
+
+                    <!-- CONFIRM PAYMENT -->
+
+                    <form asp-controller="Payment"
+                          asp-action="ConfirmPayment"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="borrowId"
+                               value="@Model.BorrowID" />
+
+                        <button type="submit"
+                                class="btn"
+                                style="background-color:#D184A2;color:white;">
+
+                            <i class="bi bi-cash-stack"></i>
+                            Confirm Cash Payment
+
+                        </button>
+
+                        <a asp-controller="Borrow"
+                           asp-action="Index"
+                           class="btn btn-secondary ms-2">
+
+                            Cancel
+
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

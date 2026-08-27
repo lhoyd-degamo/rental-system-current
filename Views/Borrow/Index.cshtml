@@ -1,0 +1,165 @@
+@model IEnumerable<CRUD.Models.Borrow>
+
+@{
+    ViewData["Title"] = "Borrow";
+}
+
+<div class="container mt-4">
+
+    <div class="card mb-4">
+        <div class="card-header"
+             style="background-color:#D184A2;color:#8B4965;">
+
+            <h3 class="mb-0" style="color:white">Borrow Records</h3>
+
+        </div>
+    </div>
+
+    <div class="card borrow-card">
+
+        <div class="card-body">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Success"]
+                </div>
+            }
+
+            @if (TempData["Info"] != null)
+            {
+                <div class="alert alert-info">
+                    @TempData["Info"]
+                </div>
+            }
+
+            <div class="d-flex justify-content-end mb-4">
+
+                <a asp-action="Create"
+                   class="btn"
+                   style="background-color:#D184A2;color:white;">
+                    Add Borrow
+                </a>
+
+            </div>
+
+            <div class="borrow-table-container">
+
+                <table class="table table-bordered borrow-table">
+
+                    <thead>
+                        <tr>
+                            <th>Customer</th> <th>Phone<br />Number</th> <th>Address</th> <th>Item</th> <th>Category</th> <th>Size</th> <th>Borrow<br/>Date</th> <th>Return<br/>Date</th> <th>Status</th>
+                            <th style="width:220px;">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var borrow in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @(borrow.Customer?.CustomerName ?? "No Customer")
+                                    </td>
+
+                                    <td>
+                                        @(borrow.Customer?.PhoneNumber ?? "N/A")
+                                    </td>
+
+                                    <td>
+                                        @(borrow.Customer?.Address ?? "N/A")
+                                    </td>
+
+                                    <td>
+                                        @(borrow.Item?.ItemName ?? "No Item")
+                                    </td>
+
+                                    <td>
+                                        @(borrow.Item?.Category?.CatName ?? "No Category")
+                                    </td>
+
+                                    <td>
+                                        @(borrow.Item?.Size ?? "N/A")
+                                    </td>
+
+                                    <td class="date-cell">
+                                        @borrow.BorrowDate.ToString("MM/dd/yyyy")
+                                    </td>
+
+                                    <td class="date-cell">
+                                        @borrow.ReturnDate.ToString("MM/dd/yyyy")
+                                    </td>
+
+                                    <td class="status-cell">
+
+                                        @if (borrow.Status == "Returned")
+                                        {
+                                            <span class="status-returned">
+                                                Returned
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-borrowed">
+                                                Borrowed
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td style="white-space:nowrap;">
+
+                                        <div class="borrow-actions">
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@borrow.BorrowID"
+                                               class="btn edit-btn">
+                                                Edit
+                                            </a>
+
+                                            @if (borrow.Status != "Returned")
+                                            {
+                                                <a asp-action="ReturnBorrow"
+                                                   asp-route-id="@borrow.BorrowID"
+                                                   class="btn return-btn">
+                                                    Return
+                                                </a>
+                                            }
+
+                                            <a asp-action="Delete"
+                                               asp-route-id="@borrow.BorrowID"
+                                               class="btn delete-btn">
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="10" class="text-center py-4">
+                                    No borrow records found.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

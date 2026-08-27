@@ -1,0 +1,59 @@
+﻿@model CRUD.Models.Item
+
+<h2>Add Item</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label>Item Name</label>
+        <input asp-for="ItemName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Amount</label>
+        <input asp-for="Amount" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Size"></label>
+        <select asp-for="Size" class="form-control">
+            <option value="">-- Select Size --</option>
+            <option>Small</option>
+            <option>Medium</option>
+            <option>Large</option>
+            <option>XL</option>
+        </select>
+        <span asp-validation-for="Size" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" class="form-control" type="number" min="1" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CatID" class="form-label"></label>
+
+        <select asp-for="CatID"
+                class="form-control"
+                asp-items="ViewBag.Categories">
+            <option value="">-- Select Category --</option>
+        </select>
+
+        <span asp-validation-for="CatID" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Save
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Back
+    </a>
+
+</form>

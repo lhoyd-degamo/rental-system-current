@@ -1,0 +1,1035 @@
+@model CRUD.Models.Borrow
+
+@{
+    ViewData["Title"] = "Create Borrow";
+
+    var availableItems =
+        ViewBag.Items as List<CRUD.Models.Item>
+        ?? new List<CRUD.Models.Item>();
+}
+
+<div class="container mt-4">
+
+    <!-- CREATE BORROW CARD -->
+
+    <div class="card shadow">
+
+        <!-- HEADER -->
+
+        <div class="card-header"
+             style="background-color:#D184A2; color:#8B4965;">
+
+            <h3 class="mb-0" style="color:white;">
+                Create Borrow
+            </h3>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form asp-action="Create"
+                  method="post"
+                  id="borrowForm">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                <!-- CUSTOMER INFORMATION -->
+
+                <h5 class="section-title">
+                    Customer Information
+                </h5>
+
+                <div class="row">
+
+                    <!-- CUSTOMER NAME -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="NewCustomerName"
+                               class="form-label">
+                            Customer Name
+                        </label>
+
+                        <input asp-for="NewCustomerName"
+                               class="form-control"
+                               placeholder="Enter customer name" />
+
+                        <span asp-validation-for="NewCustomerName"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="NewCustomerEmail"
+                               class="form-label">
+                            Email
+                        </label>
+
+                        <input asp-for="NewCustomerEmail"
+                               type="email"
+                               class="form-control"
+                               placeholder="Enter email" />
+
+                        <span asp-validation-for="NewCustomerEmail"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="NewCustomerPhone"
+                               class="form-label">
+                            Phone Number
+                        </label>
+
+                        <input asp-for="NewCustomerPhone"
+                               class="form-control"
+                               placeholder="Enter phone number" />
+
+                        <span asp-validation-for="NewCustomerPhone"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="NewCustomerAddress"
+                               class="form-label">
+                            Address
+                        </label>
+
+                        <input asp-for="NewCustomerAddress"
+                               class="form-control"
+                               placeholder="Enter address" />
+
+                        <span asp-validation-for="NewCustomerAddress"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ID TYPE -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="IDType"
+                               class="form-label">
+                            ID Type
+                        </label>
+
+                        <select asp-for="IDType"
+                                class="form-select">
+
+                            <option value="">
+                                Select ID Type
+                            </option>
+
+                            <option value="National ID">
+                                National ID
+                            </option>
+
+                            <option value="Driver's License">
+                                Driver's License
+                            </option>
+
+                            <option value="Passport">
+                                Passport
+                            </option>
+
+                            <option value="UMID">
+                                UMID
+                            </option>
+
+                            <option value="PhilHealth ID">
+                                PhilHealth ID
+                            </option>
+
+                            <option value="Postal ID">
+                                Postal ID
+                            </option>
+
+                            <option value="Voter's ID">
+                                Voter's ID
+                            </option>
+
+                            <option value="School ID">
+                                School ID
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="IDType"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- ID NUMBER -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="IDNumber"
+                               class="form-label">
+                            ID Number
+                        </label>
+
+                        <input asp-for="IDNumber"
+                               class="form-control"
+                               placeholder="Enter ID number" />
+
+                        <span asp-validation-for="IDNumber"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RENTAL ITEMS -->
+
+                <h5 class="section-title mt-4">
+                    Rental Items
+                </h5>
+
+
+                <!-- SEARCH -->
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Search Item
+                    </label>
+
+                    <input type="text"
+                           id="itemSearch"
+                           class="form-control"
+                           placeholder="Search item name, category, or size..." />
+
+                </div>
+
+
+                <!-- AVAILABLE ITEMS -->
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered borrow-create-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="availableItemsBody">
+
+                            @if (availableItems.Any())
+                            {
+                                foreach (var item in availableItems)
+                                {
+                                    <tr class="available-item-row"
+                                        data-search="@($"{item.ItemCode} {item.ItemName} {item.Category?.CatName} {item.Size}").ToLower()">
+
+                                        <td>
+                                            @item.ItemCode
+                                        </td>
+
+                                        <td>
+                                            @item.ItemName
+                                        </td>
+
+                                        <td>
+                                            @(item.Category?.CatName
+                                                ?? "No Category")
+                                        </td>
+
+                                        <td>
+                                            @item.Size
+                                        </td>
+
+                                        <td>
+                                            ₱@item.Amount.ToString("N2")
+                                        </td>
+
+                                        <td>
+
+                                            <button type="button"
+                                                    class="btn add-item-btn"
+                                                    data-id="@item.ItemID"
+                                                    data-code="@item.ItemCode"
+                                                    data-name="@item.ItemName"
+                                                    data-category="@(item.Category?.CatName ?? "No Category")"
+                                                    data-size="@item.Size"
+                                                    data-price="@item.Amount">
+
+                                                Add
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+
+                                    <td colspan="6"
+                                        class="text-center py-4">
+
+                                        No available items.
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                    <!-- PAGE-SIZE-LIMITED NAVIGATION -->
+                    <!-- Only 10 items render per page, so the list stays fast even with lots of stock -->
+                    <nav aria-label="Available items pages">
+                        <ul class="pagination justify-content-center"
+                            id="availableItemsPagination">
+                        </ul>
+                    </nav>
+
+                </div>
+
+
+                <!-- SELECTED ITEMS -->
+
+                <h5 class="section-title mt-4">
+                    Selected Items
+                </h5>
+
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered borrow-create-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="selectedItemsBody">
+
+                            <tr id="emptyRow">
+
+                                <td colspan="6"
+                                    class="text-center py-4">
+
+                                    No items selected.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- DATES -->
+
+                <div class="row mt-4">
+
+                    <!-- BORROW DATE -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="BorrowDate"
+                               class="form-label">
+
+                            Borrow Date
+
+                        </label>
+
+                        <input asp-for="BorrowDate"
+                               type="date"
+                               class="form-control"
+                               id="borrowDate" />
+
+                        <span asp-validation-for="BorrowDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <!-- RETURN DATE -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="ReturnDate"
+                               class="form-label">
+
+                            Return Date
+
+                        </label>
+
+                        <input asp-for="ReturnDate"
+                               type="date"
+                               class="form-control"
+                               id="returnDate" />
+
+                        <span asp-validation-for="ReturnDate"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <input type="hidden"
+                       asp-for="Status"
+                       value="Borrowed" />
+
+
+                <!-- FORM BUTTONS -->
+
+                <div class="mt-3 pt-3 border-top">
+
+                    <button type="submit"
+                            class="btn save-borrow-btn">
+
+                        Save Borrow
+
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn back-btn ms-2">
+
+                        Back
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const PAGE_SIZE = 10;
+
+            const searchBox =
+                document.getElementById("itemSearch");
+
+            const selectedBody =
+                document.getElementById("selectedItemsBody");
+
+            const availableBody =
+                document.getElementById("availableItemsBody");
+
+            const paginationList =
+                document.getElementById("availableItemsPagination");
+
+            const form =
+                document.getElementById("borrowForm");
+
+            const selectedItems = new Map();
+
+            // All available-item rows, captured once up front
+            const allRows =
+                Array.from(
+                    availableBody.querySelectorAll(".available-item-row")
+                );
+
+            let filteredRows = allRows.slice();
+            let currentPage = 1;
+
+
+            // ESCAPE HTML (kept for anywhere we still build via string, but
+            // selected items are now built with textContent, which is
+            // inherently safe from HTML injection)
+            function escapeHtml(text) {
+
+                const div =
+                    document.createElement("div");
+
+                div.textContent =
+                    text;
+
+                return div.innerHTML;
+
+            }
+
+
+            // SEARCH ITEMS
+
+            searchBox.addEventListener("input", function () {
+
+                const search =
+                    this.value.toLowerCase().trim();
+
+                filteredRows =
+                    search === ""
+                        ? allRows.slice()
+                        : allRows.filter(function (row) {
+                              return row.dataset.search.includes(search);
+                          });
+
+                currentPage = 1;
+
+                renderAvailablePage();
+
+            });
+
+
+            // RENDER ONLY THE CURRENT PAGE (10 ITEMS) OF AVAILABLE ITEMS
+            // This is what keeps the list from lagging: the browser only
+            // ever has to lay out 10 rows at a time, no matter how many
+            // items are in stock.
+
+            function renderAvailablePage() {
+
+                const totalPages =
+                    Math.max(
+                        1,
+                        Math.ceil(filteredRows.length / PAGE_SIZE)
+                    );
+
+                if (currentPage > totalPages) {
+                    currentPage = totalPages;
+                }
+
+                // Hide every row first
+                allRows.forEach(function (row) {
+                    row.style.display = "none";
+                });
+
+                if (filteredRows.length === 0) {
+
+                    // Nothing matched the search
+                    availableBody
+                        .querySelectorAll(".no-results-row")
+                        .forEach(function (r) { r.remove(); });
+
+                    const emptyRow =
+                        document.createElement("tr");
+
+                    emptyRow.className = "no-results-row";
+
+                    const emptyCell =
+                        document.createElement("td");
+
+                    emptyCell.colSpan = 6;
+                    emptyCell.className = "text-center py-4";
+                    emptyCell.textContent = "No matching items.";
+
+                    emptyRow.appendChild(emptyCell);
+                    availableBody.appendChild(emptyRow);
+
+                } else {
+
+                    availableBody
+                        .querySelectorAll(".no-results-row")
+                        .forEach(function (r) { r.remove(); });
+
+                    const start = (currentPage - 1) * PAGE_SIZE;
+                    const end = start + PAGE_SIZE;
+
+                    filteredRows
+                        .slice(start, end)
+                        .forEach(function (row) {
+                            row.style.display = "";
+                        });
+                }
+
+                renderPaginationControls(totalPages);
+
+            }
+
+
+            // BUILD THE 1, 2, 3, 4 ... PAGE NUMBER BUTTONS
+
+            function renderPaginationControls(totalPages) {
+
+                paginationList.innerHTML = "";
+
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                function addPageItem(label, page, opts) {
+
+                    opts = opts || {};
+
+                    const li =
+                        document.createElement("li");
+
+                    li.className =
+                        "page-item" +
+                        (opts.disabled ? " disabled" : "") +
+                        (opts.active ? " active" : "");
+
+                    const link =
+                        document.createElement("a");
+
+                    link.className = "page-link";
+                    link.href = "#";
+                    link.textContent = label;
+
+                    if (!opts.disabled && !opts.active) {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            currentPage = page;
+                            renderAvailablePage();
+                        });
+                    } else {
+                        link.addEventListener("click", function (e) {
+                            e.preventDefault();
+                        });
+                    }
+
+                    li.appendChild(link);
+                    paginationList.appendChild(li);
+
+                }
+
+                addPageItem("Prev", currentPage - 1, {
+                    disabled: currentPage === 1
+                });
+
+                for (let page = 1; page <= totalPages; page++) {
+                    addPageItem(String(page), page, {
+                        active: page === currentPage
+                    });
+                }
+
+                addPageItem("Next", currentPage + 1, {
+                    disabled: currentPage === totalPages
+                });
+
+            }
+
+
+            // ADD ITEM
+
+            allRows.forEach(function (row) {
+
+                const button =
+                    row.querySelector(".add-item-btn");
+
+                button.addEventListener("click", function () {
+
+                    const id =
+                        this.dataset.id;
+
+                    if (selectedItems.has(id)) {
+                        return;
+                    }
+
+                    selectedItems.set(id, {
+                        id: id,
+                        code: this.dataset.code,
+                        name: this.dataset.name,
+                        category: this.dataset.category,
+                        size: this.dataset.size,
+                        price: this.dataset.price
+                    });
+
+                    this.disabled = true;
+                    this.innerText = "Added";
+
+                    renderSelectedItems();
+
+                });
+
+            });
+
+
+            // DISPLAY SELECTED ITEMS
+            // Built with createElement/textContent (not innerHTML) so item
+            // names can never break the markup or inject HTML.
+
+            function renderSelectedItems() {
+
+                selectedBody.innerHTML = "";
+
+                document
+                    .querySelectorAll(".selected-item-input")
+                    .forEach(function (input) {
+                        input.remove();
+                    });
+
+
+                if (selectedItems.size === 0) {
+
+                    const row =
+                        document.createElement("tr");
+
+                    const cell =
+                        document.createElement("td");
+
+                    cell.colSpan = 6;
+                    cell.className = "text-center py-4";
+                    cell.textContent = "No items selected.";
+
+                    row.appendChild(cell);
+                    selectedBody.appendChild(row);
+
+                    return;
+                }
+
+
+                selectedItems.forEach(function (item) {
+
+                    const row =
+                        document.createElement("tr");
+
+                    function addCell(text) {
+                        const td = document.createElement("td");
+                        td.textContent = text;
+                        row.appendChild(td);
+                        return td;
+                    }
+
+                    addCell(item.code || "");
+                    addCell(item.name || "");
+                    addCell(item.category || "");
+                    addCell(item.size || "");
+
+                    addCell(
+                        "\u20B1" +
+                        Number(item.price).toLocaleString("en-PH", {
+                            minimumFractionDigits: 2
+                        })
+                    );
+
+                    const actionCell =
+                        document.createElement("td");
+
+                    const removeButton =
+                        document.createElement("button");
+
+                    removeButton.type = "button";
+                    removeButton.className = "btn remove-item";
+                    removeButton.dataset.id = item.id;
+                    removeButton.textContent = "Remove";
+
+                    removeButton.addEventListener("click", function () {
+
+                        const id = this.dataset.id;
+
+                        selectedItems.delete(id);
+
+                        const addButton =
+                            document.querySelector(
+                                '.add-item-btn[data-id="' + id + '"]'
+                            );
+
+                        if (addButton) {
+                            addButton.disabled = false;
+                            addButton.innerText = "Add";
+                        }
+
+                        renderSelectedItems();
+
+                    });
+
+                    actionCell.appendChild(removeButton);
+                    row.appendChild(actionCell);
+
+                    selectedBody.appendChild(row);
+
+
+                    // HIDDEN ITEM ID
+
+                    const input =
+                        document.createElement("input");
+
+                    input.type = "hidden";
+                    input.name = "SelectedItemIDs";
+                    input.value = item.id;
+                    input.className = "selected-item-input";
+
+                    form.appendChild(input);
+
+                });
+
+            }
+
+
+            // FORM VALIDATION
+
+            form.addEventListener("submit", function (event) {
+
+                if (selectedItems.size === 0) {
+
+                    event.preventDefault();
+
+                    alert("Please add at least one item.");
+
+                    return;
+
+                }
+
+
+                const borrowDate =
+                    document.getElementById("borrowDate");
+
+                const returnDate =
+                    document.getElementById("returnDate");
+
+
+                const today =
+                    new Date().toISOString().split("T")[0];
+
+
+                if (borrowDate.value > today) {
+
+                    event.preventDefault();
+
+                    alert("Borrow date cannot be a future date.");
+
+                    return;
+
+                }
+
+
+                if (!returnDate.value) {
+
+                    event.preventDefault();
+
+                    alert("Please select a return date.");
+
+                    return;
+
+                }
+
+
+                if (returnDate.value < borrowDate.value) {
+
+                    event.preventDefault();
+
+                    alert("Return date cannot be earlier than the borrow date.");
+
+                    return;
+
+                }
+
+            });
+
+
+            // DATE RESTRICTIONS
+
+            const borrowDate =
+                document.getElementById("borrowDate");
+
+            const returnDate =
+                document.getElementById("returnDate");
+
+
+            borrowDate.max =
+                new Date().toISOString().split("T")[0];
+
+
+            borrowDate.addEventListener("change", function () {
+                returnDate.min = this.value;
+            });
+
+
+            // INITIAL RENDER: page 1 of the available items list
+
+            renderAvailablePage();
+
+        });
+
+    </script>
+}
+
+
+<style>
+
+    /* SECTION TITLES */
+
+    .section-title {
+        color: #C76C8C;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+
+    /* TABLE */
+
+    .borrow-create-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+
+        .borrow-create-table thead th {
+            background-color: #D184A2 !important;
+            color: white !important;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+            padding: 12px 10px;
+        }
+
+
+        .borrow-create-table tbody td {
+            text-align: left;
+            vertical-align: middle;
+            padding: 12px 10px;
+        }
+
+
+    /* ADD BUTTON */
+
+    .add-item-btn {
+        background-color: #D184A2;
+        color: white;
+        border: none;
+        padding: 6px 18px;
+        border-radius: 5px;
+    }
+
+
+    /* REMOVE BUTTON */
+
+    .remove-item {
+        background-color: #C94F76;
+        color: white;
+        border: none;
+        padding: 6px 18px;
+        border-radius: 5px;
+    }
+
+
+
+    /* SAVE BUTTON */
+
+    .save-borrow-btn {
+        background-color: #D184A2;
+        color: white;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 5px;
+    }
+
+
+    /* BACK BUTTON */
+
+    .back-btn {
+        padding: 8px 18px;
+        border-radius: 5px;
+    }
+
+
+    /* INPUTS */
+
+    .form-control,
+    .form-select {
+        border-radius: 7px;
+    }
+
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #D184A2;
+            box-shadow: 0 0 0 0.15rem rgba(209, 132, 162, 0.20);
+        }
+
+
+    /* CARD */
+
+    .card-header h3 {
+        color: #8B4965;
+        font-weight: 600;
+    }
+
+
+    /* PAGINATION */
+
+    #availableItemsPagination {
+        margin-top: 15px;
+    }
+
+        #availableItemsPagination .page-link {
+            color: #C76C8C;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+
+        #availableItemsPagination .page-item.active .page-link {
+            background-color: #D184A2;
+            border-color: #D184A2;
+            color: white;
+        }
+
+        #availableItemsPagination .page-item.disabled .page-link {
+            color: #ccc;
+        }
+
+</style>

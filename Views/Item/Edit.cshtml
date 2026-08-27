@@ -1,0 +1,144 @@
+﻿@model CRUD.Models.Item
+
+<h2>Edit Item</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="ItemID" />
+    <input type="hidden" asp-for="ItemCode" />
+
+    <div class="mb-3">
+        <label>Item Code</label>
+        <input value="@Model.ItemCode" class="form-control" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label>Item Name</label>
+        <input asp-for="ItemName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Amount</label>
+        <input asp-for="Amount" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Size"></label>
+        <select asp-for="Size" class="form-control">
+            <option value="">Select Size</option>
+            <option>Small</option>
+            <option>Medium</option>
+            <option>Large</option>
+        </select>
+        <span asp-validation-for="Size" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity"
+               class="form-control"
+               type="number"
+               min="1" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+    
+
+    <div class="mb-3">
+        <label asp-for="CatID" class="form-label">Category</label>
+
+        <select asp-for="CatID"
+                asp-items="ViewBag.Categories"
+                class="form-select">
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-between">
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Back
+        </a>
+
+        <div>
+
+            <button type="submit" class="btn btn-primary">
+                Save Changes
+            </button>
+
+            <button type="button"
+                    class="btn btn-danger ms-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+<!-- DELETE MODAL -->
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+
+                <h5 class="modal-title">
+                    Delete Item
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    Are you sure you want to delete
+                    <strong>@Model.ItemName</strong>?
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <form asp-action="Delete"
+                      asp-route-id="@Model.ItemID"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Delete
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
