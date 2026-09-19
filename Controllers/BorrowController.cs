@@ -74,36 +74,57 @@ namespace CRUD.Controllers
             ModelState.Remove("Item");
             ModelState.Remove("Customer");
 
-            if (borrow.SelectedItemIDs == null || borrow.SelectedItemIDs.Count == 0)
-                ModelState.AddModelError("", "Please add at least one item.");
+            if (borrow.SelectedItemIDs == null ||
+                borrow.SelectedItemIDs.Count == 0)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Please add at least one item.");
+            }
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerName))
-                ModelState.AddModelError("NewCustomerName", "Customer name is required.");
+                ModelState.AddModelError(
+                    "NewCustomerName",
+                    "Customer name is required.");
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerEmail))
-                ModelState.AddModelError("NewCustomerEmail", "Customer email is required.");
+                ModelState.AddModelError(
+                    "NewCustomerEmail",
+                    "Customer email is required.");
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerPhone))
-                ModelState.AddModelError("NewCustomerPhone", "Customer phone number is required.");
+                ModelState.AddModelError(
+                    "NewCustomerPhone",
+                    "Customer phone number is required.");
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerAddress))
-                ModelState.AddModelError("NewCustomerAddress", "Customer address is required.");
+                ModelState.AddModelError(
+                    "NewCustomerAddress",
+                    "Customer address is required.");
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDType))
-                ModelState.AddModelError("NewCustomerIDType", "ID type is required.");
+                ModelState.AddModelError(
+                    "NewCustomerIDType",
+                    "ID type is required.");
 
             if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDNumber))
-                ModelState.AddModelError("NewCustomerIDNumber", "ID number is required.");
+                ModelState.AddModelError(
+                    "NewCustomerIDNumber",
+                    "ID number is required.");
 
             if (borrow.BorrowDate.Date > DateTime.Today)
+            {
                 ModelState.AddModelError(
                     "BorrowDate",
                     "Borrow date cannot be a future date.");
+            }
 
             if (borrow.ReturnDate.Date < borrow.BorrowDate.Date)
+            {
                 ModelState.AddModelError(
                     "ReturnDate",
                     "Return date cannot be earlier than the borrow date.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -111,7 +132,8 @@ namespace CRUD.Controllers
                 return View(borrow);
             }
 
-            var selectedIDs = (borrow.SelectedItemIDs ?? new List<int>())
+            var selectedIDs = (borrow.SelectedItemIDs ??
+                               new List<int>())
                 .Distinct()
                 .ToList();
 
@@ -163,11 +185,20 @@ namespace CRUD.Controllers
             }
             else
             {
-                customer.CustomerName = borrow.NewCustomerName;
-                customer.PhoneNumber = borrow.NewCustomerPhone;
-                customer.Address = borrow.NewCustomerAddress;
-                customer.IDType = borrow.NewCustomerIDType;
-                customer.IDNumber = borrow.NewCustomerIDNumber;
+                customer.CustomerName =
+                    borrow.NewCustomerName;
+
+                customer.PhoneNumber =
+                    borrow.NewCustomerPhone;
+
+                customer.Address =
+                    borrow.NewCustomerAddress;
+
+                customer.IDType =
+                    borrow.NewCustomerIDType;
+
+                customer.IDNumber =
+                    borrow.NewCustomerIDNumber;
 
                 await _context.SaveChangesAsync();
             }
@@ -189,6 +220,7 @@ namespace CRUD.Controllers
                 });
 
                 item.Quantity -= 1;
+
                 item.Status = item.Quantity > 0
                     ? "Available"
                     : "Borrowed";
@@ -216,7 +248,8 @@ namespace CRUD.Controllers
             if (item == null)
                 return NotFound();
 
-            if (item.Quantity <= 0 || item.Status != "Available")
+            if (item.Quantity <= 0 ||
+                item.Status != "Available")
             {
                 TempData["Error"] =
                     "This item is currently unavailable.";
@@ -275,7 +308,8 @@ namespace CRUD.Controllers
             if (item == null)
                 return NotFound();
 
-            if (item.Quantity <= 0 || item.Status != "Available")
+            if (item.Quantity <= 0 ||
+                item.Status != "Available")
             {
                 ModelState.AddModelError(
                     "",
@@ -325,13 +359,12 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                 .FirstOrDefaultAsync(b => b.BorrowID == id);
 
             if (borrow == null)
                 return NotFound();
 
-            // Load customer information into the helper fields
             if (borrow.Customer != null)
             {
                 borrow.NewCustomerName =
@@ -489,7 +522,6 @@ namespace CRUD.Controllers
             bool willBeBorrowed =
                 borrow.Status == "Borrowed";
 
-            // Return old stock first if the existing rental was borrowed
             if (wasBorrowed)
             {
                 foreach (var item in oldItems)
@@ -499,7 +531,6 @@ namespace CRUD.Controllers
                 }
             }
 
-            // Check new stock
             if (willBeBorrowed)
             {
                 foreach (var item in newItems)
@@ -519,7 +550,6 @@ namespace CRUD.Controllers
                 }
             }
 
-            // Update customer information
             if (existingBorrow.Customer != null)
             {
                 existingBorrow.Customer.CustomerName =
@@ -541,7 +571,6 @@ namespace CRUD.Controllers
                     borrow.NewCustomerIDNumber;
             }
 
-            // Update borrow information
             existingBorrow.BorrowDate =
                 borrow.BorrowDate;
 
@@ -638,6 +667,14 @@ namespace CRUD.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            if (borrow.Status != "Borrowed")
+            {
+                TempData["Error"] =
+                    "Only borrowed rentals can be returned.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
             if (actualReturnDate.Date <
                 borrow.BorrowDate.Date)
             {
@@ -677,15 +714,29 @@ namespace CRUD.Controllers
             decimal penaltyAmount =
                 daysLate * penaltyPerDay;
 
-            var penalty = new Penalty
-            {
-                BorrowID = borrow.BorrowID,
-                DaysLate = daysLate,
-                PenaltyPerDay = penaltyPerDay,
-                PenaltyAmount = penaltyAmount
-            };
+            // Prevent duplicate penalties
+            var existingPenalty = await _context.Penalties
+                .FirstOrDefaultAsync(
+                    p => p.BorrowID == borrow.BorrowID);
 
-            _context.Penalties.Add(penalty);
+            if (existingPenalty == null)
+            {
+                var penalty = new Penalty
+                {
+                    BorrowID = borrow.BorrowID,
+                    DaysLate = daysLate,
+                    PenaltyPerDay = penaltyPerDay,
+                    PenaltyAmount = penaltyAmount
+                };
+
+                _context.Penalties.Add(penalty);
+            }
+            else
+            {
+                existingPenalty.DaysLate = daysLate;
+                existingPenalty.PenaltyPerDay = penaltyPerDay;
+                existingPenalty.PenaltyAmount = penaltyAmount;
+            }
 
             borrow.Status = "Returned";
 

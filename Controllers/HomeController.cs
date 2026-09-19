@@ -47,7 +47,8 @@ namespace CRUD.Controllers
         {
             var item = await _context.Items
                 .Include(i => i.Category)
-                .FirstOrDefaultAsync(i => i.ItemID == id);
+                .FirstOrDefaultAsync(
+                    i => i.ItemID == id);
 
             if (item == null)
                 return NotFound();
@@ -58,74 +59,100 @@ namespace CRUD.Controllers
         [HttpGet]
         public IActionResult Customer()
         {
-            var customerID = HttpContext.Session.GetInt32("CustomerID");
+            var customerID =
+                HttpContext.Session.GetInt32("CustomerID");
 
             if (customerID != null)
-                return RedirectToAction(nameof(CustomerDashboard));
+                return RedirectToAction(
+                    nameof(CustomerDashboard));
 
             return View(new Customer());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Customer(Customer customer)
+        public async Task<IActionResult> Customer(
+            Customer customer)
         {
             if (!ModelState.IsValid)
                 return View(customer);
 
             var existing = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == customer.Email);
+                .FirstOrDefaultAsync(
+                    c => c.Email == customer.Email);
 
             if (existing == null)
             {
                 _context.Customers.Add(customer);
+
                 await _context.SaveChangesAsync();
             }
             else
             {
-                existing.CustomerName = customer.CustomerName;
-                existing.PhoneNumber = customer.PhoneNumber;
-                existing.Address = customer.Address;
+                existing.CustomerName =
+                    customer.CustomerName;
+
+                existing.PhoneNumber =
+                    customer.PhoneNumber;
+
+                existing.Address =
+                    customer.Address;
 
                 // Update customer's ID information
-                existing.IDType = customer.IDType;
-                existing.IDNumber = customer.IDNumber;
+                existing.IDType =
+                    customer.IDType;
+
+                existing.IDNumber =
+                    customer.IDNumber;
 
                 await _context.SaveChangesAsync();
 
                 customer = existing;
             }
 
-            HttpContext.Session.SetInt32("CustomerID", customer.CustomerID);
+            HttpContext.Session.SetInt32(
+                "CustomerID",
+                customer.CustomerID);
 
-            return RedirectToAction(nameof(CustomerDashboard));
+            return RedirectToAction(
+                nameof(CustomerDashboard));
         }
+
         public async Task<IActionResult> CustomerDashboard()
         {
-            var customerID = HttpContext.Session.GetInt32("CustomerID");
+            var customerID =
+                HttpContext.Session.GetInt32("CustomerID");
 
             if (customerID == null)
-                return RedirectToAction(nameof(Customer));
+                return RedirectToAction(
+                    nameof(Customer));
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.CustomerID == customerID.Value);
+                .FirstOrDefaultAsync(
+                    c => c.CustomerID == customerID.Value);
 
             if (customer == null)
             {
-                HttpContext.Session.Remove("CustomerID");
-                return RedirectToAction(nameof(Customer));
+                HttpContext.Session.Remove(
+                    "CustomerID");
+
+                return RedirectToAction(
+                    nameof(Customer));
             }
 
             var bookings = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                         .ThenInclude(i => i.Category)
-                .Where(b => b.CustomerID == customerID.Value)
-                .OrderByDescending(b => b.BorrowID)
+                .Where(
+                    b => b.CustomerID == customerID.Value)
+                .OrderByDescending(
+                    b => b.BorrowID)
                 .ToListAsync();
 
-            // Show all items so the customer can see both availability and price.
+            // Show all items so the customer can see
+            // both availability and price.
             var items = await _context.Items
                 .Include(i => i.Category)
                 .OrderBy(i => i.CatID)
@@ -140,8 +167,11 @@ namespace CRUD.Controllers
 
         public IActionResult CustomerLogout()
         {
-            HttpContext.Session.Remove("CustomerID");
-            return RedirectToAction(nameof(Index));
+            HttpContext.Session.Remove(
+                "CustomerID");
+
+            return RedirectToAction(
+                nameof(Index));
         }
     }
 }

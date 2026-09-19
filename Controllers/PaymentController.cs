@@ -25,7 +25,7 @@ namespace CRUD.Controllers
                 return RedirectToAction("Index", "Home");
 
             var payments = await _context.Payments
-                .Include(p => p.Borrow)
+                .Include(p => p.Borrow!)
                     .ThenInclude(b => b.Customer)
                 .OrderByDescending(p => p.PaymentDate)
                 .ToListAsync();
@@ -43,22 +43,30 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                         .ThenInclude(i => i.Category)
                 .FirstOrDefaultAsync(b => b.BorrowID == borrowId);
 
             if (borrow == null)
                 return NotFound();
 
-            var alreadyPaid = await _context.Payments.AnyAsync(p => p.BorrowID == borrowId);
+            var alreadyPaid = await _context.Payments
+                .AnyAsync(p => p.BorrowID == borrowId);
 
             if (alreadyPaid)
             {
-                TempData["Info"] = "This booking has already been paid.";
-                return RedirectToAction(nameof(Receipt), new { borrowId });
+                TempData["Info"] =
+                    "This booking has already been paid.";
+
+                return RedirectToAction(
+                    nameof(Receipt),
+                    new { borrowId });
             }
 
-            ViewBag.Amount = borrow.BorrowItems.Sum(bi => bi.Item?.Amount ?? 0);
+            ViewBag.Amount =
+                borrow.BorrowItems.Sum(
+                    bi => bi.Item?.Amount ?? 0);
+
             return View(borrow);
         }
 
@@ -73,19 +81,24 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.BorrowItems)
                     .ThenInclude(bi => bi.Item)
-                .FirstOrDefaultAsync(b => b.BorrowID == borrowId);
+                .FirstOrDefaultAsync(
+                    b => b.BorrowID == borrowId);
 
             if (borrow == null)
                 return NotFound();
 
-            var alreadyPaid = await _context.Payments.AnyAsync(p => p.BorrowID == borrowId);
+            var alreadyPaid = await _context.Payments
+                .AnyAsync(p => p.BorrowID == borrowId);
 
             if (!alreadyPaid)
             {
-                var amount = borrow.BorrowItems.Sum(bi => bi.Item?.Amount ?? 0);
+                var amount =
+                    borrow.BorrowItems.Sum(
+                        bi => bi.Item?.Amount ?? 0);
 
                 // Online bookings do not reduce stock.
-                // Reduce stock when the customer physically pays and the rental starts.
+                // Reduce stock when the customer physically pays
+                // and the rental starts.
                 if (borrow.Status == "Booked")
                 {
                     foreach (var borrowItem in borrow.BorrowItems)
@@ -94,12 +107,19 @@ namespace CRUD.Controllers
                         {
                             if (borrowItem.Item.Quantity <= 0)
                             {
-                                TempData["Error"] = $"{borrowItem.Item.ItemName} is no longer available.";
-                                return RedirectToAction(nameof(Index));
+                                TempData["Error"] =
+                                    $"{borrowItem.Item.ItemName} is no longer available.";
+
+                                return RedirectToAction(
+                                    nameof(Index));
                             }
 
                             borrowItem.Item.Quantity -= 1;
-                            borrowItem.Item.Status = borrowItem.Item.Quantity > 0 ? "Available" : "Borrowed";
+
+                            borrowItem.Item.Status =
+                                borrowItem.Item.Quantity > 0
+                                    ? "Available"
+                                    : "Borrowed";
                         }
                     }
                 }
@@ -119,7 +139,9 @@ namespace CRUD.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Receipt), new { borrowId });
+            return RedirectToAction(
+                nameof(Receipt),
+                new { borrowId });
         }
 
         // PAYMENT RECEIPT
@@ -132,21 +154,30 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                         .ThenInclude(i => i.Category)
-                .FirstOrDefaultAsync(b => b.BorrowID == borrowId);
+                .FirstOrDefaultAsync(
+                    b => b.BorrowID == borrowId);
 
             if (borrow == null)
                 return NotFound();
 
             var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.BorrowID == borrowId);
+                .FirstOrDefaultAsync(
+                    p => p.BorrowID == borrowId);
 
             if (payment == null)
-                return RedirectToAction(nameof(Create), new { borrowId });
+            {
+                return RedirectToAction(
+                    nameof(Create),
+                    new { borrowId });
+            }
 
             ViewBag.Payment = payment;
-            ViewBag.Amount = borrow.BorrowItems.Sum(bi => bi.Item?.Amount ?? 0);
+
+            ViewBag.Amount =
+                borrow.BorrowItems.Sum(
+                    bi => bi.Item?.Amount ?? 0);
 
             return View(borrow);
         }
@@ -158,17 +189,20 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                         .ThenInclude(i => i.Category)
-                .FirstOrDefaultAsync(b => b.BorrowID == id);
+                .FirstOrDefaultAsync(
+                    b => b.BorrowID == id);
 
             if (borrow == null)
                 return NotFound();
 
             var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.BorrowID == id);
+                .FirstOrDefaultAsync(
+                    p => p.BorrowID == id);
 
             ViewBag.Payment = payment;
+
             return View(borrow);
         }
 
@@ -179,15 +213,17 @@ namespace CRUD.Controllers
             var borrow = await _context.Borrows
                 .Include(b => b.Customer)
                 .Include(b => b.BorrowItems)
-                    .ThenInclude(bi => bi.Item)
+                    .ThenInclude(bi => bi.Item!)
                         .ThenInclude(i => i.Category)
-                .FirstOrDefaultAsync(b => b.BorrowID == id);
+                .FirstOrDefaultAsync(
+                    b => b.BorrowID == id);
 
             if (borrow == null)
                 return NotFound();
 
             var payment = await _context.Payments
-                .FirstOrDefaultAsync(p => p.BorrowID == id);
+                .FirstOrDefaultAsync(
+                    p => p.BorrowID == id);
 
             var lines = new List<string>
             {
@@ -205,35 +241,61 @@ namespace CRUD.Controllers
             {
                 if (bi.Item != null)
                 {
-                    lines.Add($"Item: {bi.Item.ItemName}");
-                    lines.Add($"Category: {bi.Item.Category?.CatName}");
-                    lines.Add($"Size: {bi.Item.Size}");
-                    lines.Add($"Price: PHP {bi.Item.Amount:N2}");
+                    lines.Add(
+                        $"Item: {bi.Item.ItemName}");
+
+                    lines.Add(
+                        $"Category: {bi.Item.Category?.CatName}");
+
+                    lines.Add(
+                        $"Size: {bi.Item.Size}");
+
+                    lines.Add(
+                        $"Price: PHP {bi.Item.Amount:N2}");
                 }
             }
 
-            var total = borrow.BorrowItems.Sum(bi => bi.Item?.Amount ?? 0);
+            var total =
+                borrow.BorrowItems.Sum(
+                    bi => bi.Item?.Amount ?? 0);
+
             lines.Add($"Total: PHP {total:N2}");
-            lines.Add($"Payment: {payment?.PaymentStatus ?? "Not yet paid"}");
+
+            lines.Add(
+                $"Payment: {payment?.PaymentStatus ?? "Not yet paid"}");
 
             if (borrow.Status == "Returned")
             {
                 var penalty = await _context.Penalties
-                    .FirstOrDefaultAsync(p => p.BorrowID == borrow.BorrowID);
+                    .FirstOrDefaultAsync(
+                        p => p.BorrowID == borrow.BorrowID);
 
                 if (penalty != null)
                 {
-                    lines.Add($"Late Days: {penalty.DaysLate}");
-                    lines.Add($"Penalty: PHP {penalty.PenaltyAmount:N2}");
+                    lines.Add(
+                        $"Late Days: {penalty.DaysLate}");
+
+                    lines.Add(
+                        $"Penalty: PHP {penalty.PenaltyAmount:N2}");
                 }
             }
 
-            var orderText = string.Join("\n", lines);
+            var orderText =
+                string.Join("\n", lines);
 
-            using var generator = new QRCodeGenerator();
-            using var data = generator.CreateQrCode(orderText, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(data);
-            var bytes = qrCode.GetGraphic(10);
+            using var generator =
+                new QRCodeGenerator();
+
+            using var data =
+                generator.CreateQrCode(
+                    orderText,
+                    QRCodeGenerator.ECCLevel.Q);
+
+            var qrCode =
+                new PngByteQRCode(data);
+
+            var bytes =
+                qrCode.GetGraphic(10);
 
             return File(bytes, "image/png");
         }

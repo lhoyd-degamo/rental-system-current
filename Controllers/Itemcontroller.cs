@@ -15,15 +15,22 @@ namespace CRUD.Controllers
             _context = context;
         }
 
-        private bool IsAdmin() => HttpContext.Session.GetString("AdminUser") != null;
+        private bool IsAdmin() =>
+            HttpContext.Session.GetString("AdminUser") != null;
 
         // GET: Item
-        public IActionResult Index(string searchString, int? categoryId)
+        public IActionResult Index(
+            string searchString,
+            int? categoryId)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var items = _context.Items
-        .Include(i => i.Category)
-        .AsQueryable();
+                .Include(i => i.Category)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -32,12 +39,11 @@ namespace CRUD.Controllers
                     i.Description.Contains(searchString));
             }
 
-
             if (categoryId != null)
             {
-                items = items.Where(i => i.CatID == categoryId);
+                items = items.Where(
+                    i => i.CatID == categoryId);
             }
-
 
             ViewBag.Categories = new SelectList(
                 _context.Categories.ToList(),
@@ -49,11 +55,14 @@ namespace CRUD.Controllers
             return View(items.ToList());
         }
 
-
         // GET: Item/Create
         public IActionResult Create()
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             ViewBag.Categories = new SelectList(
                 _context.Categories.ToList(),
                 "CatID",
@@ -63,14 +72,18 @@ namespace CRUD.Controllers
             return View();
         }
 
-
         // POST: Item/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Item item)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
-            // ItemCode is generated automatically, not submitted by the form
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
+            // ItemCode is generated automatically,
+            // not submitted by the form.
             ModelState.Remove(nameof(Item.ItemCode));
 
             if (ModelState.IsValid)
@@ -78,9 +91,13 @@ namespace CRUD.Controllers
                 _context.Items.Add(item);
                 _context.SaveChanges();
 
-                // Now that the item has an ItemID, generate its code
-                // (e.g. "TUX001" for a Tuxedo, "GWN014" for a Gown)
-                item.ItemCode = GenerateItemCode(item.CatID, item.ItemID);
+                // Now that the item has an ItemID,
+                // generate its code.
+                item.ItemCode =
+                    GenerateItemCode(
+                        item.CatID,
+                        item.ItemID);
+
                 _context.SaveChanges();
 
                 return RedirectToAction(nameof(Index));
@@ -96,36 +113,47 @@ namespace CRUD.Controllers
             return View(item);
         }
 
-        // Builds a readable code like "tux-001" from the category name.
-        // The numeric part is scoped to the category, so each category
-        // (tuxedo, gown, accessories, ...) keeps its own running count.
-        private string GenerateItemCode(int catId, int itemId)
+        // Builds a readable code like "tux-001"
+        // from the category name.
+        private string GenerateItemCode(
+            int catId,
+            int itemId)
         {
             var catName = _context.Categories
                 .Where(c => c.CatID == catId)
                 .Select(c => c.CatName)
                 .FirstOrDefault() ?? "";
 
-            var prefix = GetCategoryPrefix(catName);
+            var prefix =
+                GetCategoryPrefix(catName);
 
-            // Look at codes already used within this category to find the
-            // next number in the sequence (e.g. tux-001, tux-002, tux-003...)
+            // Look at codes already used within
+            // this category to find the next number.
             var existingCodes = _context.Items
-                .Where(i => i.CatID == catId
-                    && i.ItemID != itemId
-                    && i.ItemCode != null
-                    && i.ItemCode.StartsWith(prefix + "-"))
+                .Where(i =>
+                    i.CatID == catId &&
+                    i.ItemID != itemId &&
+                    i.ItemCode != null &&
+                    i.ItemCode.StartsWith(prefix + "-"))
                 .Select(i => i.ItemCode)
                 .ToList();
 
             var nextSeq = 1;
+
             if (existingCodes.Count > 0)
             {
                 var maxSeq = existingCodes
                     .Select(code =>
                     {
-                        var parts = code.Split('-');
-                        return parts.Length == 2 && int.TryParse(parts[1], out var n) ? n : 0;
+                        var parts =
+                            code.Split('-');
+
+                        return parts.Length == 2 &&
+                               int.TryParse(
+                                   parts[1],
+                                   out var n)
+                            ? n
+                            : 0;
                     })
                     .DefaultIfEmpty(0)
                     .Max();
@@ -137,28 +165,39 @@ namespace CRUD.Controllers
         }
 
         // Maps a category name to its short uppercase code prefix.
-        // e.g. "Tuxedo" -> "TUX", "Gown" -> "GOW", "Accessories" -> "ACC"
-        private static readonly Dictionary<string, string> KnownCategoryPrefixes = new()
-        {
-            { "tuxedo", "TUX" },
-            { "suit", "SUI" },
-            { "gown", "GOW" },
-            { "accessory", "ACC" },
-            { "accessories", "ACC" },
-            { "barong", "BAR" },
-            { "dress", "DRS" },
-        };
+        private static readonly Dictionary<string, string>
+            KnownCategoryPrefixes = new()
+            {
+                { "tuxedo", "TUX" },
+                { "suit", "SUI" },
+                { "gown", "GOW" },
+                { "accessory", "ACC" },
+                { "accessories", "ACC" },
+                { "barong", "BAR" },
+                { "dress", "DRS" },
+            };
 
-        private static string GetCategoryPrefix(string catName)
+        private static string GetCategoryPrefix(
+            string catName)
         {
-            var normalized = (catName ?? "").Trim().ToLowerInvariant();
+            var normalized =
+                (catName ?? "")
+                .Trim()
+                .ToLowerInvariant();
 
-            if (KnownCategoryPrefixes.TryGetValue(normalized, out var known))
+            if (KnownCategoryPrefixes.TryGetValue(
+                    normalized,
+                    out var known))
             {
                 return known;
             }
 
-            var letters = new string(normalized.Where(char.IsLetter).ToArray()).ToUpperInvariant();
+            var letters =
+                new string(
+                    normalized
+                        .Where(char.IsLetter)
+                        .ToArray())
+                .ToUpperInvariant();
 
             if (string.IsNullOrWhiteSpace(letters))
             {
@@ -170,18 +209,18 @@ namespace CRUD.Controllers
                 : letters.PadRight(3, 'X');
         }
 
-
-
         // GET: Item/Edit/5
         public IActionResult Edit(int id)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var item = _context.Items.Find(id);
 
             if (item == null)
-            {
                 return NotFound();
-            }
 
             ViewBag.Categories = new SelectList(
                 _context.Categories.ToList(),
@@ -193,15 +232,18 @@ namespace CRUD.Controllers
             return View(item);
         }
 
-
-
         // POST: Item/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Item item)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
-            // Keep the original item code even if it wasn't posted back
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
+            // Keep the original item code even if
+            // it wasn't posted back.
             if (string.IsNullOrWhiteSpace(item.ItemCode))
             {
                 var existingCode = _context.Items
@@ -210,9 +252,12 @@ namespace CRUD.Controllers
                     .Select(i => i.ItemCode)
                     .FirstOrDefault();
 
-                item.ItemCode = !string.IsNullOrWhiteSpace(existingCode)
-                    ? existingCode
-                    : GenerateItemCode(item.CatID, item.ItemID);
+                item.ItemCode =
+                    !string.IsNullOrWhiteSpace(existingCode)
+                        ? existingCode
+                        : GenerateItemCode(
+                            item.CatID,
+                            item.ItemID);
             }
 
             ModelState.Remove(nameof(Item.ItemCode));
@@ -235,32 +280,35 @@ namespace CRUD.Controllers
             return View(item);
         }
 
-
-
         // GET: Item/Delete/5
         public IActionResult Delete(int id)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var item = _context.Items
                 .Include(i => i.Category)
-                .FirstOrDefault(i => i.ItemID == id);
+                .FirstOrDefault(
+                    i => i.ItemID == id);
 
             if (item == null)
-            {
                 return NotFound();
-            }
 
             return View(item);
         }
-
-
 
         // POST: Item/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var item = _context.Items.Find(id);
 
             if (item != null)
@@ -272,29 +320,37 @@ namespace CRUD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-
         // GET: Item/Details/5
         public IActionResult Details(int id)
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var item = _context.Items
                 .Include(i => i.Category)
-                .FirstOrDefault(i => i.ItemID == id);
+                .FirstOrDefault(
+                    i => i.ItemID == id);
 
             if (item == null)
-            {
                 return NotFound();
-            }
 
             return View(item);
         }
 
         public IActionResult Suits()
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var suits = _context.Items
-                .Where(i => i.Category.CatName == "Suit")
+                .Include(i => i.Category)
+                .Where(i =>
+                    i.Category != null &&
+                    i.Category.CatName == "Suit")
                 .ToList();
 
             return View(suits);
@@ -302,16 +358,19 @@ namespace CRUD.Controllers
 
         public IActionResult Gowns()
         {
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            if (!IsAdmin())
+                return RedirectToAction(
+                    "Index",
+                    "Home");
+
             var gowns = _context.Items
-                .Where(i => i.Category.CatName == "Gown")
+                .Include(i => i.Category)
+                .Where(i =>
+                    i.Category != null &&
+                    i.Category.CatName == "Gown")
                 .ToList();
 
             return View(gowns);
         }
-
-
     }
-
-
 }
