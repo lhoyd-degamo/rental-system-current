@@ -1,17 +1,35 @@
 @model IEnumerable<CRUD.Models.Payment>
+
 @{
     ViewData["Title"] = "Payments";
 }
 
 <div class="container-fluid py-4">
+
+    <!-- BACK TO DASHBOARD -->
+    <a asp-controller="Admin"
+       asp-action="Dashboard"
+       class="btn btn-outline-secondary mb-3">
+        Back
+    </a>
+
     <div class="mb-4">
+
         <h2>Payments</h2>
-        <p class="text-muted">Payments recorded at the boutique.</p>
+
+        <p class="text-muted">
+            Payments recorded at the boutique.
+        </p>
+
     </div>
 
+
     <div class="table-responsive bg-white border">
+
         <table class="table table-bordered table-hover mb-0">
+
             <thead class="table-light">
+
                 <tr>
                     <th>Payment</th>
                     <th>Booking</th>
@@ -22,31 +40,76 @@
                     <th>Status</th>
                     <th></th>
                 </tr>
+
             </thead>
+
             <tbody>
+
                 @foreach (var payment in Model)
                 {
                     <tr>
-                        <td>#@payment.PaymentID</td>
-                        <td>#@payment.BorrowID</td>
-                        <td>@payment.Borrow?.Customer?.CustomerName</td>
-                        <td>₱@payment.AmountPaid.ToString("N2")</td>
-                        <td>@payment.PaymentMethod</td>
-                        <td>@payment.PaymentDate.ToString("MM/dd/yyyy")</td>
-                        <td><span class="badge bg-success">@payment.PaymentStatus</span></td>
+
                         <td>
-                            <a asp-action="Receipt" asp-route-borrowId="@payment.BorrowID" class="btn btn-sm btn-outline-dark">Receipt / QR</a>
+                            #@payment.PaymentID
                         </td>
+
+                        <td>
+                            #@payment.BorrowID
+                        </td>
+
+                        <td>
+                            @payment.Borrow?.Customer?.CustomerName
+                        </td>
+
+                        <td>
+                            ₱@payment.AmountPaid.ToString("N2")
+                        </td>
+
+                        <td>
+                            @payment.PaymentMethod
+                        </td>
+
+                        <td>
+                            @payment.PaymentDate.ToString("MM/dd/yyyy")
+                        </td>
+
+                        <td>
+
+                            <span class="badge bg-success">
+                                @payment.PaymentStatus
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <a asp-action="Receipt"
+                               asp-route-borrowId="@payment.BorrowID"
+                               class="btn btn-sm btn-outline-dark">
+                                Receipt / QR
+                            </a>
+
+                        </td>
+
                     </tr>
                 }
 
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">No payments recorded.</td>
+
+                        <td colspan="8"
+                            class="text-center py-4 text-muted">
+                            No payments recorded.
+                        </td>
+
                     </tr>
                 }
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>

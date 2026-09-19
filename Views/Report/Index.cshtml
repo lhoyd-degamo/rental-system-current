@@ -1,0 +1,430 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+
+    var categoryReport = ViewBag.CategoryReport;
+}
+
+<div class="container mt-4">
+
+    <!-- BACK TO DASHBOARD -->
+    <a asp-controller="Admin"
+       asp-action="Dashboard"
+       class="btn btn-outline-secondary mb-3">
+        Back
+    </a>
+
+
+    <!-- HEADER SECTION -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="mb-1">
+                Reports
+            </h2>
+
+            <p class="text-muted mb-0">
+                Inventory, rental, payment, and penalty summary
+            </p>
+
+        </div>
+
+        <button type="button"
+                class="btn btn-outline-secondary"
+                onclick="window.print()">
+            Print Report
+        </button>
+
+    </div>
+
+
+    <!-- INVENTORY SUMMARY -->
+    <h4 class="mb-3">
+        Inventory Summary
+    </h4>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Items
+                    </h6>
+
+                    <h3>
+                        @ViewBag.TotalItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Available
+                    </h6>
+
+                    <h3>
+                        @ViewBag.AvailableItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Borrowed
+                    </h6>
+
+                    <h3>
+                        @ViewBag.BorrowedItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Out of Stock
+                    </h6>
+
+                    <h3>
+                        @ViewBag.OutOfStockItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INVENTORY NOTICE -->
+    <div class="card border bg-white p-4 mb-4">
+
+        <h5>
+            Inventory Notice
+        </h5>
+
+        <p class="text-muted mb-1">
+            Items with stock of 2 or less:
+        </p>
+
+        <h2>
+            @ViewBag.LowStockCount
+        </h2>
+
+        <p class="text-muted small mb-0">
+            Check the Items page when stock is low.
+        </p>
+
+    </div>
+
+
+    <!-- TRANSACTION SUMMARY -->
+    <h4 class="mb-3">
+        Rental Transaction Summary
+    </h4>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Bookings
+                    </h6>
+
+                    <h3>
+                        @ViewBag.TotalBookings
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Booked
+                    </h6>
+
+                    <h3>
+                        @ViewBag.BookedTransactions
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Borrowed
+                    </h6>
+
+                    <h3>
+                        @ViewBag.BorrowedTransactions
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Returned
+                    </h6>
+
+                    <h3>
+                        @ViewBag.ReturnedTransactions
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CATEGORY REPORT -->
+    <h4 class="mb-3">
+        Inventory by Category
+    </h4>
+
+    <div class="table-responsive mb-4">
+
+        <table class="table table-bordered table-striped">
+
+            <thead>
+
+                <tr>
+                    <th>Category</th>
+                    <th>Total Items</th>
+                    <th>Available</th>
+                    <th>Borrowed</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @if (categoryReport != null)
+                {
+                    foreach (var category in categoryReport)
+                    {
+                        <tr>
+
+                            <td>
+                                @category.CategoryName
+                            </td>
+
+                            <td>
+                                @category.TotalItems
+                            </td>
+
+                            <td>
+                                @category.AvailableItems
+                            </td>
+
+                            <td>
+                                @category.BorrowedItems
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="4"
+                            class="text-center">
+                            No category data available.
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAYMENT AND PENALTY SUMMARY -->
+    <h4 class="mb-3">
+        Payment and Penalty Summary
+    </h4>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Payments
+                    </h6>
+
+                    <h3>
+                        ₱@ViewBag.TotalPayments.ToString("N2")
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Paid Transactions
+                    </h6>
+
+                    <h3>
+                        @ViewBag.TotalPaidTransactions
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Late Returns
+                    </h6>
+
+                    <h3>
+                        @ViewBag.TotalLateReturns
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card border">
+
+                <div class="card-body">
+
+                    <h6 class="text-muted">
+                        Total Penalty
+                    </h6>
+
+                    <h3>
+                        ₱@ViewBag.TotalPenalty?.ToString("N2")
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PRINT STYLES -->
+<style>
+
+    @@media print {
+
+        .btn {
+            display: none !important;
+        }
+
+        nav,
+        footer {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+        }
+
+    }
+
+</style>

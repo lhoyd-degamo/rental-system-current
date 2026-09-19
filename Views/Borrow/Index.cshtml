@@ -1,33 +1,64 @@
 @model IEnumerable<CRUD.Models.Borrow>
+
 @{
     ViewData["Title"] = "Bookings and Rentals";
 }
 
 <div class="container-fluid py-4">
+
+    <!-- BACK TO DASHBOARD -->
+    <a asp-controller="Admin"
+       asp-action="Dashboard"
+       class="btn btn-outline-secondary mb-3">
+        Back
+    </a>
+
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
         <div>
             <h2>Bookings and Rentals</h2>
-            <p class="text-muted mb-0">Manage online bookings, physical rentals and returns.</p>
+
+            <p class="text-muted mb-0">
+                Manage online bookings, physical rentals and returns.
+            </p>
         </div>
-        <a asp-action="Create" class="btn btn-dark">ADD PHYSICAL RENTAL</a>
+
+        <a asp-action="Create"
+           class="btn btn-dark">
+            ADD PHYSICAL RENTAL
+        </a>
+
     </div>
+
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Info"] != null)
-    {
-        <div class="alert alert-info">@TempData["Info"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
     }
 
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["Info"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
     <div class="table-responsive bg-white border">
+
         <table class="table table-bordered table-hover mb-0 align-middle">
+
             <thead class="table-light">
+
                 <tr>
                     <th>Booking</th>
                     <th>Customer</th>
@@ -40,97 +71,181 @@
                     <th>Penalty</th>
                     <th>Actions</th>
                 </tr>
+
             </thead>
+
             <tbody>
+
                 @if (Model.Any())
                 {
                     foreach (var borrow in Model)
                     {
                         <tr>
-                            <td>#@borrow.BorrowID</td>
+
                             <td>
-                                @borrow.Customer?.CustomerName<br />
-                                <small class="text-muted">@borrow.Customer?.PhoneNumber</small>
+                                #@borrow.BorrowID
                             </td>
+
                             <td>
+                                @borrow.Customer?.CustomerName
+                                <br />
+                                <small class="text-muted">
+                                    @borrow.Customer?.PhoneNumber
+                                </small>
+                            </td>
+
+                            <td>
+
                                 @foreach (var bi in borrow.BorrowItems)
                                 {
-                                    <div>@bi.Item?.ItemName</div>
+                                    <div>
+                                        @bi.Item?.ItemName
+                                    </div>
                                 }
+
                             </td>
+
                             <td>
+
                                 @foreach (var bi in borrow.BorrowItems)
                                 {
-                                    <div>@bi.Item?.Category?.CatName</div>
+                                    <div>
+                                        @bi.Item?.Category?.CatName
+                                    </div>
                                 }
+
                             </td>
+
                             <td>
+
                                 @foreach (var bi in borrow.BorrowItems)
                                 {
-                                    <div>@bi.Item?.Size</div>
+                                    <div>
+                                        @bi.Item?.Size
+                                    </div>
                                 }
+
                             </td>
-                            <td>@borrow.BorrowDate.ToString("MM/dd/yyyy")</td>
-                            <td>@borrow.ReturnDate.ToString("MM/dd/yyyy")</td>
+
                             <td>
+                                @borrow.BorrowDate.ToString("MM/dd/yyyy")
+                            </td>
+
+                            <td>
+                                @borrow.ReturnDate.ToString("MM/dd/yyyy")
+                            </td>
+
+                            <td>
+
                                 @if (borrow.Status == "Booked")
                                 {
-                                    <span class="badge bg-warning text-dark">Booked</span>
+                                    <span class="badge bg-warning text-dark">
+                                        Booked
+                                    </span>
                                 }
                                 else if (borrow.Status == "Borrowed")
                                 {
-                                    <span class="badge bg-primary">Borrowed</span>
+                                    <span class="badge bg-primary">
+                                        Borrowed
+                                    </span>
+
                                     @if (borrow.IsOverdue)
                                     {
-                                        <div class="status-overdue mt-1">Overdue</div>
+                                        <div class="status-overdue mt-1">
+                                            Overdue
+                                        </div>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="badge bg-success">Returned</span>
+                                    <span class="badge bg-success">
+                                        Returned
+                                    </span>
                                 }
+
                             </td>
+
                             <td>
+
                                 @if (borrow.Status == "Returned")
                                 {
-                                    <span>See receipt</span>
+                                    <span>
+                                        See receipt
+                                    </span>
                                 }
                                 else if (borrow.IsOverdue)
                                 {
-                                    <span>Late return</span>
+                                    <span>
+                                        Late return
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span>₱0.00</span>
+                                    <span>
+                                        ₱0.00
+                                    </span>
                                 }
+
                             </td>
+
                             <td>
+
                                 <div class="borrow-actions">
-                                    <a asp-action="Edit" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-outline-secondary">Edit</a>
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@borrow.BorrowID"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        Edit
+                                    </a>
 
                                     @if (borrow.Status == "Booked")
                                     {
-                                        <a asp-controller="Payment" asp-action="Create" asp-route-borrowId="@borrow.BorrowID" class="btn btn-sm btn-success">Pay</a>
+                                        <a asp-controller="Payment"
+                                           asp-action="Create"
+                                           asp-route-borrowId="@borrow.BorrowID"
+                                           class="btn btn-sm btn-success">
+                                            Pay
+                                        </a>
                                     }
 
                                     @if (borrow.Status == "Borrowed")
                                     {
-                                        <a asp-action="ReturnBorrow" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-warning">Return</a>
+                                        <a asp-action="ReturnBorrow"
+                                           asp-route-id="@borrow.BorrowID"
+                                           class="btn btn-sm btn-warning">
+                                            Return
+                                        </a>
                                     }
 
-                                    <a asp-action="Delete" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-danger">Delete</a>
+                                    <a asp-action="Delete"
+                                       asp-route-id="@borrow.BorrowID"
+                                       class="btn btn-sm btn-danger">
+                                        Delete
+                                    </a>
+
                                 </div>
+
                             </td>
+
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="10" class="text-center py-4">No bookings or rentals found.</td>
+
+                        <td colspan="10"
+                            class="text-center py-4">
+                            No bookings or rentals found.
+                        </td>
+
                     </tr>
                 }
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>
