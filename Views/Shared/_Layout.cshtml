@@ -1,73 +1,59 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] Boutique Rental</title>
+    <title>@ViewData["Title"] - Pearls & More</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/crud.styles.css" asp-append-version="true" />
 </head>
-
 <body>
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isHomePage = controller == "Home" && action == "Index";
+}
 
-    <button id="sidebarToggle" class="toggle-btn">
-        ☰
-    </button>
+@if (!isHomePage)
+{
+    <button id="sidebarToggle" class="toggle-btn" type="button">☰</button>
 
-    <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
-
-        <button id="sidebarClose" class="close-btn">
-            ✕
-        </button>
-
-        <div class="logo">
-            Boutique
-        </div>
-
+        <button id="sidebarClose" class="close-btn" type="button">×</button>
+        <div class="logo">PEARLS & MORE</div>
         <hr />
 
         <div class="menu">
+            <a asp-controller="Home" asp-action="Index">Home</a>
 
-            <a asp-controller="Home" asp-action="Index">
-                Home.
-            </a>
-
-            <a asp-controller="Item" asp-action="Index">
-                Items.
-            </a>
-
-            <a asp-controller="Category" asp-action="Index">
-                Categories.
-            </a>
-
-            <a asp-controller="Borrow" asp-action="Index">
-                Borrow.
-            </a>
-
+            @if (Context.Session.GetString("AdminUser") != null)
+            {
+                <a asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                <a asp-controller="Item" asp-action="Index">Items</a>
+                <a asp-controller="Category" asp-action="Index">Categories</a>
+                <a asp-controller="Borrow" asp-action="Index">Bookings / Rentals</a>
+                <a asp-controller="Payment" asp-action="Index">Payments</a>
+                <a asp-controller="Admin" asp-action="ChangePassword">Change Password</a>
+                <a asp-controller="Admin" asp-action="Logout">Logout</a>
+            }
+            else if (Context.Session.GetInt32("CustomerID") != null)
+            {
+                <a asp-controller="Home" asp-action="CustomerDashboard">My Dashboard</a>
+                <a asp-controller="Home" asp-action="CustomerLogout">Logout</a>
+            }
         </div>
-
     </div>
+}
 
-    <div id="main" class="main">
+<div id="main" class="main @(isHomePage ? "home-main" : "")">
+    @RenderBody()
+</div>
 
-        @RenderBody()
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
 
-    </div>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-
-    @await RenderSectionAsync("Scripts", required: false)
-
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

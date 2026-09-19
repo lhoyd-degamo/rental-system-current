@@ -20,12 +20,18 @@ namespace CRUD.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<BorrowItem> BorrowItems { get; set; }
+        public DbSet<UserModel> Users { get; set; }
+        public DbSet<Penalty> Penalties { get; set; }
 
         protected override void OnModelCreating(
            ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Penalty>()
+                .HasOne(p => p.Borrow)
+                .WithOne()
+                .HasForeignKey<Penalty>(p => p.BorrowID);
 
             // BorrowItem -> Borrow
             modelBuilder.Entity<BorrowItem>()
@@ -34,14 +40,12 @@ namespace CRUD.Data
                 .HasForeignKey(bi => bi.BorrowID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
             // BorrowItem -> Item
             modelBuilder.Entity<BorrowItem>()
                 .HasOne(bi => bi.Item)
                 .WithMany()
                 .HasForeignKey(bi => bi.ItemID)
                 .OnDelete(DeleteBehavior.NoAction);
-
 
             // Borrow -> Item
             modelBuilder.Entity<Borrow>()
@@ -50,14 +54,12 @@ namespace CRUD.Data
                 .HasForeignKey(b => b.ItemID)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
             // Borrow -> Customer
             modelBuilder.Entity<Borrow>()
                 .HasOne(b => b.Customer)
-                .WithMany()
+                .WithMany(c => c.Borrows)
                 .HasForeignKey(b => b.CustomerID)
                 .OnDelete(DeleteBehavior.NoAction);
-
 
             // Decimal precision
             modelBuilder.Entity<Item>()
@@ -73,10 +75,18 @@ namespace CRUD.Data
                 .HasIndex(i => i.ItemCode)
                 .IsUnique();
 
-
             modelBuilder.Entity<Payment>()
                 .Property(p => p.AmountPaid)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Penalty>()
+                .Property(p => p.PenaltyPerDay)
+                   .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Penalty>()
+                .Property(p => p.PenaltyAmount)
+                .HasPrecision(18, 2);
+
         }
     }
 }

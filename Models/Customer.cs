@@ -21,6 +21,6 @@ namespace CRUD.Models
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; } = "";
 
-        public ICollection<Borrow>? Borrows { get; set; }
+        public ICollection<Borrow> Borrows { get; set; } = new List<Borrow>();
     }
 }

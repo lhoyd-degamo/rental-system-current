@@ -1,0 +1,46 @@
+@model IEnumerable<CRUD.Models.Item>
+@{
+    ViewData["Title"] = ViewBag.CategoryName;
+}
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h1>@ViewBag.CategoryName</h1>
+        <p class="text-muted">Items in this category.</p>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var item in Model)
+        {
+            var image = $"/Images/Items/{item.CatID}/{item.ItemCode}.jpg";
+            var fallback = (item.Category?.CatName ?? "").ToLower().Contains("suit") ||
+                           (item.Category?.CatName ?? "").ToLower().Contains("tux") ||
+                           (item.Category?.CatName ?? "").ToLower().Contains("barong")
+                ? "/Images/suit4.jpg"
+                : "/Images/gown4.jpg";
+
+            <div class="col-sm-6 col-lg-4">
+                <div class="card border h-100 overflow-hidden">
+                    <img src="@image" alt="@item.ItemName" style="width:100%;height:350px;object-fit:cover;" onerror="this.onerror=null;this.src='@fallback';" />
+                    <div class="card-body">
+                        <h5>@item.ItemName</h5>
+                        <div class="text-muted">@item.Category?.CatName</div>
+                        <div>Size: @item.Size</div>
+                        <div class="mt-2"><strong>₱@item.Amount.ToString("N2")</strong></div>
+                        <div class="mt-2">
+                            @if (item.Quantity > 0 && item.Status == "Available")
+                            {
+                                <span class="badge bg-success">Available</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Unavailable</span>
+                            }
+                        </div>
+                        <a asp-action="ItemDetails" asp-route-id="@item.ItemID" class="btn btn-outline-dark mt-3">VIEW DETAILS</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

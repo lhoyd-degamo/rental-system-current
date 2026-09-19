@@ -1,0 +1,56 @@
+@model CRUD.Models.Borrow
+@{
+    ViewData["Title"] = "Order Information";
+    var payment = ViewBag.Payment as CRUD.Models.Payment;
+}
+
+<div class="container py-5">
+    <div class="card border bg-white mx-auto" style="max-width:760px;">
+        <div class="card-body p-4">
+            <div class="text-center">
+                <h2>PEARLS & MORE</h2>
+                <p class="text-muted">Rental Order Information</p>
+            </div>
+
+            <hr />
+
+            <div class="row g-3">
+                <div class="col-md-6"><strong>Booking ID</strong><br />#@Model.BorrowID</div>
+                <div class="col-md-6"><strong>Customer</strong><br />@Model.Customer?.CustomerName</div>
+                <div class="col-md-6"><strong>Email</strong><br />@Model.Customer?.Email</div>
+                <div class="col-md-6"><strong>Phone</strong><br />@Model.Customer?.PhoneNumber</div>
+                <div class="col-md-6"><strong>Borrow Date</strong><br />@Model.BorrowDate.ToString("MMMM dd, yyyy")</div>
+                <div class="col-md-6"><strong>Expected Return</strong><br />@Model.ReturnDate.ToString("MMMM dd, yyyy")</div>
+                <div class="col-md-6"><strong>Status</strong><br />@Model.Status</div>
+                <div class="col-md-6"><strong>Payment</strong><br />@(payment?.PaymentStatus ?? "Not yet paid")</div>
+            </div>
+
+            <hr />
+
+            <h5>Items</h5>
+            @foreach (var bi in Model.BorrowItems)
+            {
+                <div class="border p-3 mb-2">
+                    <strong>@bi.Item?.ItemName</strong><br />
+                    <small class="text-muted">
+                        @bi.Item?.Category?.CatName · Size @bi.Item?.Size · ₱@bi.Item?.Amount.ToString("N2")
+                    </small>
+                </div>
+            }
+
+            @if (Model.Status == "Returned")
+            {
+                <hr />
+                <h5>Penalty</h5>
+                <p class="mb-0">
+                    Please see the receipt for the final penalty amount.
+                </p>
+            }
+
+            <div class="alert alert-light border mt-4 mb-0">
+                <strong>Order information only.</strong><br />
+                Payment is completed physically at Pearls & More Bridal Fashion.
+            </div>
+        </div>
+    </div>
+</div>

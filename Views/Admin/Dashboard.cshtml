@@ -1,0 +1,141 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h2>Admin Dashboard</h2>
+        <p class="text-muted mb-0">Pearls & More Bridal Fashion Rental Management System</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">ITEMS</small>
+                <h3 class="mt-2 mb-0">@ViewBag.ItemCount</h3>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">CATEGORIES</small>
+                <h3 class="mt-2 mb-0">@ViewBag.CategoryCount</h3>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">CUSTOMERS</small>
+                <h3 class="mt-2 mb-0">@ViewBag.CustomerCount</h3>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">PAYMENTS</small>
+                <h3 class="mt-2 mb-0">@ViewBag.PaymentCount</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">BOOKED</small>
+                <h4 class="mt-2 mb-0">@ViewBag.BookedCount</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">BORROWED</small>
+                <h4 class="mt-2 mb-0">@ViewBag.BorrowedCount</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border bg-white p-3">
+                <small class="text-muted">RETURNED</small>
+                <h4 class="mt-2 mb-0">@ViewBag.ReturnedCount</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="card border bg-white p-4 h-100">
+                <h5>Management</h5>
+                <p class="text-muted">Use these sections to manage the rental system.</p>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <a asp-controller="Item" asp-action="Index" class="btn btn-outline-dark w-100">Manage Items</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Category" asp-action="Index" class="btn btn-outline-dark w-100">Manage Categories</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Borrow" asp-action="Index" class="btn btn-outline-dark w-100">Bookings / Rentals</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Payment" asp-action="Index" class="btn btn-outline-dark w-100">Payments</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Admin" asp-action="ChangePassword" class="btn btn-outline-dark w-100">Change Password</a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark w-100">Customer Website</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border bg-white p-4 h-100">
+                <h5>Inventory Notice</h5>
+                <p class="text-muted mb-1">Items with stock of 2 or less:</p>
+                <h2>@ViewBag.LowStockCount</h2>
+                <p class="text-muted small">Check the Items page when stock is low.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border bg-white p-4">
+        <h5>Category Inventory</h5>
+        <p class="text-muted small">Each category should contain at least 15 items for your capstone requirement.</p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Category</th>
+                        <th>Items</th>
+                        <th>Minimum</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in ViewBag.CategoryInventory)
+                    {
+                        <tr>
+                            <td>@category.CatName</td>
+                            <td>@category.Count</td>
+                            <td>15</td>
+                            <td>
+                                @if (category.Count >= 15)
+                                {
+                                    <span class="badge bg-success">Complete</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Need @(15 - category.Count)</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="border p-3 bg-light">
+            <strong>Item photo path:</strong>
+            <code>wwwroot/Images/Items/&lt;CatID&gt;/&lt;ItemCode&gt;.jpg</code>
+            <br />
+            Example: <code>wwwroot/Images/Items/1/GOW-001.jpg</code>
+        </div>
+    </div>
+</div>

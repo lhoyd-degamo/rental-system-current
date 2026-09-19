@@ -1,0 +1,44 @@
+@model CRUD.Models.Item
+@{
+    ViewData["Title"] = Model.ItemName;
+    var image = $"/Images/Items/{Model.CatID}/{Model.ItemCode}.jpg";
+    var fallback = (Model.Category?.CatName ?? "").ToLower().Contains("suit") ||
+                   (Model.Category?.CatName ?? "").ToLower().Contains("tux") ||
+                   (Model.Category?.CatName ?? "").ToLower().Contains("barong")
+        ? "/Images/suit4.jpg"
+        : "/Images/gown4.jpg";
+}
+
+<div class="container py-5">
+    <div class="row bg-white border">
+        <div class="col-md-6 p-0">
+            <img src="@image" alt="@Model.ItemName" style="width:100%;height:600px;object-fit:cover;" onerror="this.onerror=null;this.src='@fallback';" />
+        </div>
+        <div class="col-md-6 p-4">
+            <div class="text-muted">@Model.Category?.CatName</div>
+            <h1 class="mt-2">@Model.ItemName</h1>
+            <p>@Model.Description</p>
+            <h4>₱@Model.Amount.ToString("N2")</h4>
+            <p><strong>Size:</strong> @Model.Size</p>
+            <p><strong>Stock:</strong> @Model.Quantity</p>
+            <p>
+                <strong>Availability:</strong>
+                @(Model.Quantity > 0 && Model.Status == "Available" ? "Available" : "Unavailable")
+            </p>
+
+            @if (Model.Quantity > 0 && Model.Status == "Available")
+            {
+                <a asp-controller="Borrow"
+                   asp-action="Book"
+                   asp-route-itemId="@Model.ItemID"
+                   class="btn btn-dark mt-3">
+                    BOOK THIS ITEM
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary mt-3" disabled>UNAVAILABLE</button>
+            }
+        </div>
+    </div>
+</div>

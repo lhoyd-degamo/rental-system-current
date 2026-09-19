@@ -1,165 +1,136 @@
 @model IEnumerable<CRUD.Models.Borrow>
-
 @{
-    ViewData["Title"] = "Borrow";
+    ViewData["Title"] = "Bookings and Rentals";
 }
 
-<div class="container mt-4">
-
-    <div class="card mb-4">
-        <div class="card-header"
-             style="background-color:#D184A2;color:#8B4965;">
-
-            <h3 class="mb-0" style="color:white">Borrow Records</h3>
-
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2>Bookings and Rentals</h2>
+            <p class="text-muted mb-0">Manage online bookings, physical rentals and returns.</p>
         </div>
+        <a asp-action="Create" class="btn btn-dark">ADD PHYSICAL RENTAL</a>
     </div>
 
-    <div class="card borrow-card">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">@TempData["Info"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
-        <div class="card-body">
-
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">
-                    @TempData["Success"]
-                </div>
-            }
-
-            @if (TempData["Info"] != null)
-            {
-                <div class="alert alert-info">
-                    @TempData["Info"]
-                </div>
-            }
-
-            <div class="d-flex justify-content-end mb-4">
-
-                <a asp-action="Create"
-                   class="btn"
-                   style="background-color:#D184A2;color:white;">
-                    Add Borrow
-                </a>
-
-            </div>
-
-            <div class="borrow-table-container">
-
-                <table class="table table-bordered borrow-table">
-
-                    <thead>
+    <div class="table-responsive bg-white border">
+        <table class="table table-bordered table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Booking</th>
+                    <th>Customer</th>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Size</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Penalty</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    foreach (var borrow in Model)
+                    {
                         <tr>
-                            <th>Customer</th> <th>Phone<br />Number</th> <th>Address</th> <th>Item</th> <th>Category</th> <th>Size</th> <th>Borrow<br/>Date</th> <th>Return<br/>Date</th> <th>Status</th>
-                            <th style="width:220px;">Actions</th>
+                            <td>#@borrow.BorrowID</td>
+                            <td>
+                                @borrow.Customer?.CustomerName<br />
+                                <small class="text-muted">@borrow.Customer?.PhoneNumber</small>
+                            </td>
+                            <td>
+                                @foreach (var bi in borrow.BorrowItems)
+                                {
+                                    <div>@bi.Item?.ItemName</div>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var bi in borrow.BorrowItems)
+                                {
+                                    <div>@bi.Item?.Category?.CatName</div>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var bi in borrow.BorrowItems)
+                                {
+                                    <div>@bi.Item?.Size</div>
+                                }
+                            </td>
+                            <td>@borrow.BorrowDate.ToString("MM/dd/yyyy")</td>
+                            <td>@borrow.ReturnDate.ToString("MM/dd/yyyy")</td>
+                            <td>
+                                @if (borrow.Status == "Booked")
+                                {
+                                    <span class="badge bg-warning text-dark">Booked</span>
+                                }
+                                else if (borrow.Status == "Borrowed")
+                                {
+                                    <span class="badge bg-primary">Borrowed</span>
+                                    @if (borrow.IsOverdue)
+                                    {
+                                        <div class="status-overdue mt-1">Overdue</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Returned</span>
+                                }
+                            </td>
+                            <td>
+                                @if (borrow.Status == "Returned")
+                                {
+                                    <span>See receipt</span>
+                                }
+                                else if (borrow.IsOverdue)
+                                {
+                                    <span>Late return</span>
+                                }
+                                else
+                                {
+                                    <span>₱0.00</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="borrow-actions">
+                                    <a asp-action="Edit" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-outline-secondary">Edit</a>
+
+                                    @if (borrow.Status == "Booked")
+                                    {
+                                        <a asp-controller="Payment" asp-action="Create" asp-route-borrowId="@borrow.BorrowID" class="btn btn-sm btn-success">Pay</a>
+                                    }
+
+                                    @if (borrow.Status == "Borrowed")
+                                    {
+                                        <a asp-action="ReturnBorrow" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-warning">Return</a>
+                                    }
+
+                                    <a asp-action="Delete" asp-route-id="@borrow.BorrowID" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var borrow in Model)
-                            {
-                                <tr>
-
-                                    <td>
-                                        @(borrow.Customer?.CustomerName ?? "No Customer")
-                                    </td>
-
-                                    <td>
-                                        @(borrow.Customer?.PhoneNumber ?? "N/A")
-                                    </td>
-
-                                    <td>
-                                        @(borrow.Customer?.Address ?? "N/A")
-                                    </td>
-
-                                    <td>
-                                        @(borrow.Item?.ItemName ?? "No Item")
-                                    </td>
-
-                                    <td>
-                                        @(borrow.Item?.Category?.CatName ?? "No Category")
-                                    </td>
-
-                                    <td>
-                                        @(borrow.Item?.Size ?? "N/A")
-                                    </td>
-
-                                    <td class="date-cell">
-                                        @borrow.BorrowDate.ToString("MM/dd/yyyy")
-                                    </td>
-
-                                    <td class="date-cell">
-                                        @borrow.ReturnDate.ToString("MM/dd/yyyy")
-                                    </td>
-
-                                    <td class="status-cell">
-
-                                        @if (borrow.Status == "Returned")
-                                        {
-                                            <span class="status-returned">
-                                                Returned
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="status-borrowed">
-                                                Borrowed
-                                            </span>
-                                        }
-
-                                    </td>
-
-                                    <td style="white-space:nowrap;">
-
-                                        <div class="borrow-actions">
-
-                                            <a asp-action="Edit"
-                                               asp-route-id="@borrow.BorrowID"
-                                               class="btn edit-btn">
-                                                Edit
-                                            </a>
-
-                                            @if (borrow.Status != "Returned")
-                                            {
-                                                <a asp-action="ReturnBorrow"
-                                                   asp-route-id="@borrow.BorrowID"
-                                                   class="btn return-btn">
-                                                    Return
-                                                </a>
-                                            }
-
-                                            <a asp-action="Delete"
-                                               asp-route-id="@borrow.BorrowID"
-                                               class="btn delete-btn">
-                                                Delete
-                                            </a>
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="10" class="text-center py-4">
-                                    No borrow records found.
-                                </td>
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4">No bookings or rentals found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-
 </div>

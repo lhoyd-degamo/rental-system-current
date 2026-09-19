@@ -1,309 +1,150 @@
 html {
-    font-size: 14px;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-.btn:focus,
-.btn:active:focus,
-.btn-link.nav-link:focus,
-.form-control:focus,
-.form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
+    font-size: 16px;
     position: relative;
     min-height: 100%;
 }
 
 body {
-    margin-bottom: 60px;
+    margin: 0 0 60px 0;
+    background: #f7f7f7;
+    color: #333;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
+.main {
+    padding: 25px;
+}
 
-/* Sidebar */
+.home-main {
+    padding: 0 !important;
+}
 
+h1, h2, h3, h4, h5 {
+    color: #333;
+}
+
+.btn-primary {
+    background: #555;
+    border-color: #555;
+}
+
+.btn-primary:hover {
+    background: #333;
+    border-color: #333;
+}
+
+.form-control,
+.form-select {
+    border-radius: 4px;
+}
+
+.card {
+    border-radius: 5px;
+}
+
+.table thead th {
+    vertical-align: middle;
+}
+
+/* Simple admin/customer sidebar */
 .toggle-btn {
     position: fixed;
     top: 15px;
     left: 15px;
-    width: 45px;
-    height: 40px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 22px;
+    width: 42px;
+    height: 38px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
     z-index: 2000;
 }
 
-
-/* Close Button */
-
 .close-btn {
     position: absolute;
-    top: 15px;
-    right: -45px;
-    width: 40px;
-    height: 40px;
-    background: white;
-    border: 1px solid #ddd;
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
+    top: 10px;
+    right: 10px;
+    border: 0;
+    background: transparent;
+    color: #fff;
     font-size: 20px;
-    display: none;
 }
-
-
-/* Sidebar */
 
 .sidebar {
     position: fixed;
     top: 0;
-    left: -260px;
-    width: 260px;
+    left: -240px;
+    width: 240px;
     height: 100vh;
-    background: white;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    transition: 0.3s;
+    background: #555;
+    padding: 25px 15px;
+    transition: left .2s ease;
     z-index: 1500;
 }
 
-    .sidebar.show {
-        left: 0;
-    }
-
-
-/* Logo */
-
-.logo {
-    font-size: 22px;
-    font-weight: bold;
+.sidebar.show {
+    left: 0;
 }
 
+.logo {
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 5px 10px;
+}
 
-/* Menu */
+.sidebar hr {
+    border-color: rgba(255,255,255,.3);
+}
 
 .menu a {
     display: block;
-    padding: 12px;
-    margin-bottom: 8px;
-    color: #333;
+    color: #fff;
     text-decoration: none;
-    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 3px 0;
+    border-radius: 4px;
 }
 
-
-/* Content */
-
-.main {
-    padding: 30px;
-    transition: 0.3s;
+.menu a:hover {
+    background: rgba(255,255,255,.12);
 }
 
-    .main.shift {
-        margin-left: 260px;
-    }
-
-
-/* Theme */
-
-body {
-    background: #fff8fa;
-    font-family: 'Poppins', sans-serif;
+.main.shift {
+    margin-left: 240px;
 }
-
-
-/* Sidebar Theme */
-
-#sidebar {
-    background: #d98ca3 !important;
-}
-
-    #sidebar a {
-        color: white;
-        text-decoration: none;
-        display: block;
-        padding: 12px 18px;
-        margin: 6px 10px;
-        border-radius: 10px;
-        transition: .3s;
-    }
-
-
-/* Page Titles */
-
-h1,
-h2,
-h3,
-h4,
-h5 {
-    color: #a04f73;
-    font-weight: 600;
-}
-
-
-/* Cards */
-
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-    transition: .3s;
-}
-
-
-/* Tables */
-
-.table {
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-    .table thead {
-        background: #d98ca3;
-        color: white;
-    }
-
-
-/* Buttons */
-
-.btn-primary {
-    background: #d98ca3;
-    border: none;
-}
-
-.btn-success {
-    background: #e6a8bb;
-    border: none;
-    color: white;
-}
-
-.btn-warning {
-    background: #f4d4de;
-    border: none;
-    color: #7a3b56;
-}
-
-.btn-danger {
-    background: #c85b74;
-    border: none;
-}
-
-
-/* Inputs */
-
-.form-control,
-.form-select {
-    border-radius: 10px;
-    border: 1px solid #f1c4d3;
-}
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #d98ca3;
-        box-shadow: 0 0 0 .2rem rgba(217, 140, 163, .25);
-    }
-
-
-/* Body Font */
-
-body {
-    font-family: 'Poppins', sans-serif;
-}
-
-
-/* Dashboard Title */
-
-.dashboard-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 48px;
-    color: #c86f8b;
-    font-weight: 700;
-}
-
-
-/* Dashboard Subtitle */
-
-.dashboard-subtitle {
-    font-size: 18px;
-    color: #888;
-}
-
 
 .borrow-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: nowrap;
+    gap: 5px;
+    flex-wrap: wrap;
 }
 
-    .borrow-actions .btn {
-        width: 65px;
-        height: 34px;
-        padding: 0;
-        margin: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-        border: none;
-        border-radius: 6px;
-    }
-
-.edit-btn {
-    background-color: #D184A2;
-    color: white;
+.status-borrowed,
+.status-returned,
+.status-overdue {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
 }
 
-.return-btn {
-    background-color: #E5A0B8;
-    color: white;
+.status-borrowed {
+    background: #e7f1ff;
+    color: #245b9e;
 }
 
-.delete-btn {
-    background-color: #C94F76;
-    color: white;
+.status-returned {
+    background: #e7f6e9;
+    color: #26733b;
 }
 
-/* Add Borrow Tables */
-
-.borrow-table thead th {
-    background-color: #D184A2 !important;
-    color: #8B4965 !important;
-    font-weight: 600;
+.status-overdue {
+    background: #fde8e8;
+    color: #a33a3a;
 }
 
-
-/* Selected Items */
-
-.selected-items-table thead th {
-    background-color: #D184A2 !important;
-    color: #8B4965 !important;
-}
-
-
-/* Selected Items Title */
-
-h3 {
-    color: #C86F8B;
-}
-
-/* BORROW TABLE HEADER TEXT */
-
-.borrow-table thead th {
-    background-color: #D184A2 !important;
-    color: white !important;
-    font-weight: 600;
-    text-align: center;
-    vertical-align: middle;
+.penalty-note {
+    font-size: 11px;
+    color: #a33a3a;
+    margin-top: 3px;
 }

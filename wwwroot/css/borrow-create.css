@@ -1,0 +1,147 @@
+/* ==========================================
+   Borrow / Create page styles
+   Extracted from Views/Borrow/Create.cshtml
+   ========================================== */
+
+
+/* SECTION TITLES */
+
+.section-title {
+    color: #C76C8C;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+
+/* TABLE */
+
+.borrow-create-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+
+    .borrow-create-table thead th {
+        background-color: #D184A2 !important;
+        color: white !important;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 10px;
+    }
+
+
+    .borrow-create-table tbody td {
+        text-align: left;
+        vertical-align: middle;
+        padding: 12px 10px;
+    }
+
+
+/* ADD BUTTON */
+
+.add-item-btn {
+    background-color: #D184A2;
+    color: white;
+    border: none;
+    padding: 6px 18px;
+    border-radius: 5px;
+}
+
+
+    .add-item-btn:hover {
+        background-color: #C76C8C;
+        color: white;
+    }
+
+
+/* REMOVE BUTTON */
+
+.remove-item {
+    background-color: #C94F76;
+    color: white;
+    border: none;
+    padding: 6px 18px;
+    border-radius: 5px;
+}
+
+
+    .remove-item:hover {
+        background-color: #B83F65;
+        color: white;
+    }
+
+
+/* SAVE BUTTON */
+
+.save-borrow-btn {
+    background-color: #D184A2;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+}
+
+
+    .save-borrow-btn:hover {
+        background-color: #C76C8C;
+        color: white;
+    }
+
+
+/* BACK BUTTON */
+
+.back-btn {
+    padding: 8px 18px;
+    border-radius: 5px;
+}
+
+
+/* INPUTS */
+
+.form-control,
+.form-select {
+    border-radius: 7px;
+}
+
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #D184A2;
+        box-shadow: 0 0 0 0.15rem rgba(209, 132, 162, 0.20);
+    }
+
+
+/* CARD */
+
+.card-header h3 {
+    color: #8B4965;
+    font-weight: 600;
+}
+
+
+/* PAGINATION */
+
+#availableItemsPagination {
+    margin-top: 15px;
+}
+
+
+    #availableItemsPagination .page-link {
+        color: #C76C8C;
+        border-radius: 5px;
+        margin: 0 2px;
+    }
+
+
+    #availableItemsPagination .page-item.active .page-link {
+        background-color: #D184A2;
+        border-color: #D184A2;
+        color: white;
+    }
+
+
+    #availableItemsPagination .page-item.disabled .page-link {
+        color: #ccc;
+    }
+

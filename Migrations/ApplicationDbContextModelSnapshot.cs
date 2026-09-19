@@ -222,6 +222,65 @@ namespace crud.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("CRUD.Models.Penalty", b =>
+                {
+                    b.Property<int>("PenaltyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PenaltyID"));
+
+                    b.Property<int>("BorrowID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DaysLate")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PenaltyAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PenaltyPerDay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PenaltyID");
+
+                    b.HasIndex("BorrowID")
+                        .IsUnique();
+
+                    b.ToTable("Penalties");
+                });
+
+            modelBuilder.Entity("crud.Models.UserModel", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("CRUD.Models.Borrow", b =>
                 {
                     b.HasOne("CRUD.Models.Customer", "Customer")
@@ -280,6 +339,17 @@ namespace crud.Migrations
                     b.HasOne("CRUD.Models.Borrow", "Borrow")
                         .WithMany()
                         .HasForeignKey("BorrowID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Borrow");
+                });
+
+            modelBuilder.Entity("CRUD.Models.Penalty", b =>
+                {
+                    b.HasOne("CRUD.Models.Borrow", "Borrow")
+                        .WithOne()
+                        .HasForeignKey("CRUD.Models.Penalty", "BorrowID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

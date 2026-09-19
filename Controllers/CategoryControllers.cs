@@ -12,13 +12,24 @@ namespace CRUD.Controllers
         {
             _context = context;
         }
+        private bool IsAdmin() => HttpContext.Session.GetString("AdminUser") != null;
+
         public IActionResult Index()
         {
-            var categories = _context.Categories.ToList();
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            var categories = _context.Categories
+                .OrderBy(c => c.CatName)
+                .ToList();
+
+            ViewBag.ItemCounts = categories.ToDictionary(
+                c => c.CatID,
+                c => _context.Items.Count(i => i.CatID == c.CatID));
+
             return View(categories);
         }
         public IActionResult Create()
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             return View();
         }
 
@@ -26,6 +37,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Category category)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             if (ModelState.IsValid)
             {
                 _context.Categories.Add(category);
@@ -40,6 +52,7 @@ namespace CRUD.Controllers
         // GET: Category/Edit/5
         public IActionResult Edit(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var category = _context.Categories.Find(id);
 
             if (category == null)
@@ -55,6 +68,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Category category)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             if (ModelState.IsValid)
             {
                 _context.Categories.Update(category);
@@ -69,6 +83,7 @@ namespace CRUD.Controllers
         // GET: Category/Delete/5
         public IActionResult Delete(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var category = _context.Categories.Find(id);
 
             if (category == null)
@@ -84,6 +99,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var category = _context.Categories.Find(id);
 
             if (category != null)
@@ -98,6 +114,7 @@ namespace CRUD.Controllers
         // GET: Category/Details/5
         public IActionResult Details(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var category = _context.Categories.FirstOrDefault(c => c.CatID == id);
 
             if (category == null)

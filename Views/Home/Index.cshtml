@@ -1,79 +1,162 @@
-﻿<div class="container mt-5">
+@model IEnumerable<CRUD.Models.Category>
+@{
+    ViewData["Title"] = "Home";
+}
 
-    <div class="text-center my-5">
+<style>
+    .home-hero {
+        background: #eeeeee;
+        min-height: 480px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 50px 20px;
+        position: relative;
+    }
 
-        <h1 style="
-            font-family: 'Playfair Display', serif;
-            font-size: 52px;
-            font-weight: 700;
-            color: #D88CA5;
-            letter-spacing: 2px;">
+    .home-hero h1 {
+        font-size: 48px;
+        font-weight: 600;
+    }
 
-            Pearls &amp; More Bridal Fashion
+    .home-hero p {
+        max-width: 650px;
+        margin: 15px auto 25px;
+        color: #666;
+    }
 
-        </h1>
+    .home-actions {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
 
-        <p style="
-            font-family: 'Poppins', sans-serif;
-            font-size: 18px;
-            color: #6c757d;">
+    .home-actions a {
+        margin-left: 5px;
+    }
 
-            Find the perfect gown or suit for your unforgettable moments.
+    .home-section {
+        padding: 60px 5%;
+        background: #fff;
+    }
 
+    .category-card {
+        border: 1px solid #ddd;
+        background: #fff;
+        height: 100%;
+    }
+
+    .category-card img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        background: #eee;
+    }
+
+    .category-card .content {
+        padding: 18px;
+    }
+
+    .how-section {
+        padding: 60px 5%;
+        background: #f5f5f5;
+    }
+
+    .step {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .step-number {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+</style>
+
+<section class="home-hero">
+    <div class="home-actions">
+        <a asp-controller="Home" asp-action="Customer" class="btn btn-dark">CUSTOMER</a>
+        <a asp-controller="Admin" asp-action="Login" class="btn btn-outline-dark">ADMIN</a>
+    </div>
+
+    <div>
+        <p class="text-uppercase small mb-2">Pearls & More Bridal Fashion</p>
+        <h1>Your Perfect Look Awaits</h1>
+        <p>
+            Browse our clothing collection, make an online reservation,
+            and complete your rental and payment at the boutique.
         </p>
-
+        <a href="#categories" class="btn btn-dark">VIEW COLLECTION</a>
     </div>
+</section>
 
-    <div class="row">
+<section class="home-section text-center">
+    <p class="text-muted mb-2">PEARLS & MORE</p>
+    <h2>Our Collection</h2>
+    <p class="text-muted">
+        Select a category to see the items available for rental.
+    </p>
 
-        <div class="col-md-6">
+    <div id="categories" class="row g-4 mt-3">
+        @if (Model.Any())
+        {
+            foreach (var category in Model)
+            {
+                var name = (category.CatName ?? "").ToLower();
+                var image = name.Contains("suit") || name.Contains("tux") || name.Contains("barong")
+                    ? "/Images/suit4.jpg"
+                    : "/Images/gown4.jpg";
 
-            <div class="card shadow">
-
-                <img src="~/images/suit4.jpg"
-                     class="card-img-top"
-                     style="height:350px; object-fit:cover;">
-
-                <div class="card-body text-center">
-
-                    <h3>SUITS</h3>
-
-                    <a asp-controller="Home"
-                       asp-action="Suits"
-                       class="btn btn-danger">
-                        View Collection
-                    </a>
-
+                <div class="col-md-6 col-lg-4">
+                    <div class="category-card">
+                        <img src="@image" alt="@category.CatName" />
+                        <div class="content text-start">
+                            <h4>@category.CatName</h4>
+                            <p class="text-muted">Browse items in this category.</p>
+                            <a asp-action="Category"
+                               asp-route-id="@category.CatID"
+                               class="btn btn-outline-dark">
+                                VIEW ITEMS
+                            </a>
+                        </div>
+                    </div>
                 </div>
-
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <p class="text-muted">No categories have been added yet.</p>
             </div>
+        }
+    </div>
+</section>
 
+<section class="how-section">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2>How It Works</h2>
         </div>
 
-        <div class="col-md-6">
-
-            <div class="card shadow">
-
-                <img src="~/images/gown4.jpg"
-                     class="card-img-top"
-                     style="height:350px; object-fit:cover;">
-
-                <div class="card-body text-center">
-
-                    <h3>GOWNS</h3>
-
-                    <a asp-controller="Home"
-                       asp-action="Gowns"
-                       class="btn btn-danger">
-                        View Collection
-                    </a>
-
-                </div>
-
+        <div class="row">
+            <div class="col-md-4 step">
+                <div class="step-number">01</div>
+                <h4>Browse</h4>
+                <p class="text-muted">Choose from the available categories and items.</p>
             </div>
 
+            <div class="col-md-4 step">
+                <div class="step-number">02</div>
+                <h4>Book Online</h4>
+                <p class="text-muted">Reserve your selected item online.</p>
+            </div>
+
+            <div class="col-md-4 step">
+                <div class="step-number">03</div>
+                <h4>Visit & Pay</h4>
+                <p class="text-muted">Visit the boutique, pay physically, and receive the rental.</p>
+            </div>
         </div>
-
     </div>
-
-</div>
+</section>

@@ -15,9 +15,12 @@ namespace CRUD.Controllers
             _context = context;
         }
 
+        private bool IsAdmin() => HttpContext.Session.GetString("AdminUser") != null;
+
         // GET: Item
         public IActionResult Index(string searchString, int? categoryId)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var items = _context.Items
         .Include(i => i.Category)
         .AsQueryable();
@@ -50,6 +53,7 @@ namespace CRUD.Controllers
         // GET: Item/Create
         public IActionResult Create()
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             ViewBag.Categories = new SelectList(
                 _context.Categories.ToList(),
                 "CatID",
@@ -65,6 +69,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Item item)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             // ItemCode is generated automatically, not submitted by the form
             ModelState.Remove(nameof(Item.ItemCode));
 
@@ -170,6 +175,7 @@ namespace CRUD.Controllers
         // GET: Item/Edit/5
         public IActionResult Edit(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var item = _context.Items.Find(id);
 
             if (item == null)
@@ -194,6 +200,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Item item)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             // Keep the original item code even if it wasn't posted back
             if (string.IsNullOrWhiteSpace(item.ItemCode))
             {
@@ -233,6 +240,7 @@ namespace CRUD.Controllers
         // GET: Item/Delete/5
         public IActionResult Delete(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var item = _context.Items
                 .Include(i => i.Category)
                 .FirstOrDefault(i => i.ItemID == id);
@@ -252,6 +260,7 @@ namespace CRUD.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var item = _context.Items.Find(id);
 
             if (item != null)
@@ -268,6 +277,7 @@ namespace CRUD.Controllers
         // GET: Item/Details/5
         public IActionResult Details(int id)
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var item = _context.Items
                 .Include(i => i.Category)
                 .FirstOrDefault(i => i.ItemID == id);
@@ -282,6 +292,7 @@ namespace CRUD.Controllers
 
         public IActionResult Suits()
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var suits = _context.Items
                 .Where(i => i.Category.CatName == "Suit")
                 .ToList();
@@ -291,6 +302,7 @@ namespace CRUD.Controllers
 
         public IActionResult Gowns()
         {
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
             var gowns = _context.Items
                 .Where(i => i.Category.CatName == "Gown")
                 .ToList();

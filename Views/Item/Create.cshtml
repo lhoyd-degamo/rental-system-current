@@ -1,59 +1,75 @@
-﻿@model CRUD.Models.Item
+@model CRUD.Models.Item
 
-<h2>Add Item</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border bg-white p-4">
+                <h2>Add Item</h2>
+                <p class="text-muted">Add an item to a category.</p>
 
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label>Item Name</label>
-        <input asp-for="ItemName" class="form-control" />
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="ItemName" class="form-label">Item Name</label>
+                        <input asp-for="ItemName" class="form-control" />
+                        <span asp-validation-for="ItemName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Amount" class="form-label">Rental Price</label>
+                            <input asp-for="Amount" class="form-control" type="number" min="0.1" step="0.01" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Size" class="form-label">Size</label>
+                            <select asp-for="Size" class="form-select">
+                                <option value="">Select Size</option>
+                                <option>Small</option>
+                                <option>Medium</option>
+                                <option>Large</option>
+                                <option>XL</option>
+                            </select>
+                            <span asp-validation-for="Size" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Quantity" class="form-label">Quantity</label>
+                            <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CatID" class="form-label">Category</label>
+                            <select asp-for="CatID" class="form-select" asp-items="ViewBag.Categories">
+                                <option value="">Select Category</option>
+                            </select>
+                            <span asp-validation-for="CatID" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border">
+                        After saving, the system creates an Item Code. Put the item's photo in
+                        <code>wwwroot/Images/Items/&lt;CatID&gt;/&lt;ItemCode&gt;.jpg</code>.
+                    </div>
+
+                    <button type="submit" class="btn btn-dark">SAVE ITEM</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">CANCEL</a>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label>Description</label>
-        <input asp-for="Description" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Amount</label>
-        <input asp-for="Amount" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Size"></label>
-        <select asp-for="Size" class="form-control">
-            <option value="">-- Select Size --</option>
-            <option>Small</option>
-            <option>Medium</option>
-            <option>Large</option>
-            <option>XL</option>
-        </select>
-        <span asp-validation-for="Size" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Quantity"></label>
-        <input asp-for="Quantity" class="form-control" type="number" min="1" />
-        <span asp-validation-for="Quantity" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="CatID" class="form-label"></label>
-
-        <select asp-for="CatID"
-                class="form-control"
-                asp-items="ViewBag.Categories">
-            <option value="">-- Select Category --</option>
-        </select>
-
-        <span asp-validation-for="CatID" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Save
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        Back
-    </a>
-
-</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

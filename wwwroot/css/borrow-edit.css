@@ -1,0 +1,71 @@
+/* ==========================================
+   Borrow / Edit page styles - item card design
+   Extracted from Views/Borrow/Edit.cshtml
+   ========================================== */
+
+
+.item-card {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 15px;
+    background-color: white;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+    .item-card:hover {
+        border-color: #D184A2;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+
+    .item-card input[type="checkbox"] {
+        display: none;
+    }
+
+    .item-card.selected {
+        border-color: #D184A2;
+        background-color: #fff5f8;
+        box-shadow: 0 4px 12px rgba(209,132,162,0.25);
+    }
+
+.item-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.item-check {
+    flex-shrink: 0;
+}
+
+.check-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    color: transparent;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.item-card.selected .check-circle {
+    background-color: #D184A2;
+    border-color: #D184A2;
+    color: white;
+}
+
+.item-info {
+    flex: 1;
+}
+
+    .item-info h6 {
+        color: #333;
+        font-weight: 600;
+    }
+

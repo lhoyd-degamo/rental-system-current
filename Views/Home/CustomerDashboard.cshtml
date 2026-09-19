@@ -1,0 +1,154 @@
+@model IEnumerable<CRUD.Models.Borrow>
+@using CRUD.Models
+@{
+    ViewData["Title"] = "Customer Dashboard";
+    var customer = ViewBag.Customer as Customer;
+    var items = ViewBag.AvailableItems as IEnumerable<Item> ?? Enumerable.Empty<Item>();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h1 class="mb-1">Customer Dashboard</h1>
+            <p class="text-muted mb-0">Welcome, @customer?.CustomerName</p>
+        </div>
+        <a asp-action="CustomerLogout" class="btn btn-outline-secondary">Logout</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card border mb-4">
+        <div class="card-body">
+            <h5>My Information</h5>
+            <div class="row mt-3">
+                <div class="col-md-3"><strong>Name</strong><br />@customer?.CustomerName</div>
+                <div class="col-md-3"><strong>Email</strong><br />@customer?.Email</div>
+                <div class="col-md-3"><strong>Phone</strong><br />@customer?.PhoneNumber</div>
+                <div class="col-md-3"><strong>Address</strong><br />@customer?.Address</div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Available Items</h3>
+
+    <div class="row g-3 mb-5">
+        @foreach (var item in items)
+        {
+            var image = $"/Images/Items/{item.CatID}/{item.ItemCode}.jpg";
+            var fallback = (item.Category?.CatName ?? "").ToLower().Contains("suit") ||
+                           (item.Category?.CatName ?? "").ToLower().Contains("tux") ||
+                           (item.Category?.CatName ?? "").ToLower().Contains("barong")
+                ? "/Images/suit4.jpg"
+                : "/Images/gown4.jpg";
+
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <div class="card border h-100 overflow-hidden">
+                    <img src="@image"
+                         alt="@item.ItemName"
+                         style="width:100%;height:260px;object-fit:cover;"
+                         onerror="this.onerror=null;this.src='@fallback';" />
+                    <div class="card-body">
+                        <small class="text-muted">@item.Category?.CatName</small>
+                        <h5 class="mt-1">@item.ItemName</h5>
+                        <div>Size: @item.Size</div>
+                        <div class="mt-2"><strong>₱@item.Amount.ToString("N2")</strong></div>
+                        <div class="mt-2">
+                            @if (item.Quantity > 0 && item.Status == "Available")
+                            {
+                                <span class="badge bg-success">Available</span>
+                                <span class="text-muted small"> Stock: @item.Quantity</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Unavailable</span>
+                            }
+                        </div>
+
+                        @if (item.Quantity > 0 && item.Status == "Available")
+                        {
+                            <a asp-controller="Borrow"
+                               asp-action="Book"
+                               asp-route-itemId="@item.ItemID"
+                               class="btn btn-dark w-100 mt-3">
+                                BOOK ITEM
+                            </a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-light w-100 mt-3" disabled>UNAVAILABLE</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3 class="mb-3">My Bookings</h3>
+
+    @if (Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered bg-white">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking</th>
+                        <th>Item</th>
+                        <th>Borrow Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>#@booking.BorrowID</td>
+                            <td>
+                                @foreach (var bi in booking.BorrowItems)
+                                {
+                                    <div>@bi.Item?.ItemName</div>
+                                }
+                            </td>
+                            <td>@booking.BorrowDate.ToString("MM/dd/yyyy")</td>
+                            <td>@booking.ReturnDate.ToString("MM/dd/yyyy")</td>
+                            <td>
+                                @if (booking.Status == "Booked")
+                                {
+                                    <span class="badge bg-warning text-dark">Booked</span>
+                                }
+                                else if (booking.Status == "Borrowed")
+                                {
+                                    <span class="badge bg-primary">Borrowed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Returned</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="Payment"
+                                   asp-action="OrderQR"
+                                   asp-route-id="@booking.BorrowID"
+                                   class="btn btn-sm btn-outline-dark">
+                                    ORDER / QR
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-light border">You do not have any bookings yet.</div>
+    }
+</div>

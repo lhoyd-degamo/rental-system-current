@@ -1,0 +1,71 @@
+@model CRUD.Models.Borrow
+@{
+    ViewData["Title"] = "Payment Receipt";
+    var payment = ViewBag.Payment as CRUD.Models.Payment;
+    var amount = ViewBag.Amount != null ? (decimal)ViewBag.Amount : 0m;
+}
+
+<div class="container py-4">
+    <div class="card border bg-white mx-auto" style="max-width:800px;">
+        <div class="card-body p-4">
+            <div class="text-center">
+                <h2>PEARLS & MORE</h2>
+                <p class="text-muted mb-1">Bridal Fashion Rental</p>
+                <h4 class="mt-3">Payment Receipt</h4>
+            </div>
+
+            <hr />
+
+            <div class="row g-3">
+                <div class="col-md-6"><strong>Booking ID</strong><br />#@Model.BorrowID</div>
+                <div class="col-md-6"><strong>Payment Date</strong><br />@payment?.PaymentDate.ToString("MMMM dd, yyyy hh:mm tt")</div>
+                <div class="col-md-6"><strong>Customer</strong><br />@Model.Customer?.CustomerName</div>
+                <div class="col-md-6"><strong>Payment Method</strong><br />@payment?.PaymentMethod</div>
+            </div>
+
+            <hr />
+
+            <h5>Rental Items</h5>
+            @foreach (var bi in Model.BorrowItems)
+            {
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>
+                        @bi.Item?.ItemName<br />
+                        <small class="text-muted">@bi.Item?.Category?.CatName · Size @bi.Item?.Size</small>
+                    </span>
+                    <strong>₱@(bi.Item?.Amount.ToString("N2"))</strong>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between mt-3">
+                <strong>Total Paid</strong>
+                <strong>₱@amount.ToString("N2")</strong>
+            </div>
+
+            <div class="mt-3">
+                <span class="badge bg-success">PAID</span>
+                <span class="badge bg-primary">@Model.Status</span>
+            </div>
+
+            <hr />
+
+            <div class="text-center">
+                <h5>Order QR Code</h5>
+                <p class="text-muted small">Scan to view the order information.</p>
+                <img src="@Url.Action("GenerateQR", "Payment", new { id = Model.BorrowID })"
+                     alt="Order QR Code"
+                     style="width:220px;height:220px;" />
+                <p class="text-muted small mt-2">Booking #@Model.BorrowID</p>
+            </div>
+
+            <div class="alert alert-light border mt-3">
+                This QR code contains the rental order information. It is not an online payment QR code.
+            </div>
+
+            <div class="text-center mt-3">
+                <button onclick="window.print()" class="btn btn-dark">PRINT RECEIPT</button>
+                <a asp-controller="Payment" asp-action="Index" class="btn btn-outline-secondary">BACK</a>
+            </div>
+        </div>
+    </div>
+</div>

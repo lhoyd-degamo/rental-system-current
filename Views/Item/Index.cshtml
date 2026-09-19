@@ -1,96 +1,70 @@
-﻿@model List<CRUD.Models.Item>
+@model List<CRUD.Models.Item>
 
-<div class="text-center mb-5">
-    <h2 class="fw-bold"> Items</h2>
-    <p class="text-muted">Manage boutique rental items.</p>
-    <hr style="width:120px; margin:auto;">
-</div>
-
-<form asp-action="Index" method="get">
-
-    <div class="row mb-3">
-
-        <div class="col-md-5">
-            <input type="text"
-                   name="searchString"
-                   class="form-control"
-                   placeholder=" Search item name..."
-                   value="@Context.Request.Query["searchString"]" />
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2>Items</h2>
+            <p class="text-muted mb-0">Manage rental items and inventory.</p>
         </div>
-
-        <div class="col-md-4">
-            <select name="categoryId" class="form-select">
-                <option value="">-- All Categories --</option>
-
-                @foreach (var category in ViewBag.Categories)
-                {
-                    <option value="@category.Value">
-                        @category.Text
-                    </option>
-                }
-            </select>
-        </div>
-
-        <div class="col-md-3 d-flex justify-content-end gap-2">
-
-            <button type="submit" class="btn btn-primary">
-                Filter
-            </button>
-
-            <a asp-action="Index" class="btn btn-secondary">
-                Clear
-            </a>
-
-            <a asp-action="Create" class="btn btn-success">
-                Add Item
-            </a>
-
-        </div>
-
+        <a asp-action="Create" class="btn btn-dark">ADD ITEM</a>
     </div>
 
-</form>
+    <form asp-action="Index" method="get" class="bg-white border p-3 mb-4">
+        <div class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="searchString" class="form-control" placeholder="Search item name or description..." value="@Context.Request.Query["searchString"]" />
+            </div>
+            <div class="col-md-4">
+                <select name="categoryId" class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Value" selected="@(Context.Request.Query["categoryId"] == category.Value ? "selected" : null)">@category.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-dark">FILTER</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">CLEAR</a>
+            </div>
+        </div>
+    </form>
 
-<table class="table table-bordered table-hover align-middle">
+    <div class="table-responsive bg-white border">
+        <table class="table table-bordered table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.ItemCode</td>
+                        <td>@item.ItemName</td>
+                        <td>@item.Category?.CatName</td>
+                        <td>@item.Size</td>
+                        <td>₱@item.Amount.ToString("N2")</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Status</td>
+                        <td><a asp-action="Edit" asp-route-id="@item.ItemID" class="btn btn-sm btn-outline-dark">Edit</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Item Code</th>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Size</th>
-            <th>Amount</th>
-            <th>Quantity</th>
-            <th>Category Name</th>
-            <th width="120">Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-
-                <td>@item.ItemID</td>
-                <td><span class="badge bg-secondary">@item.ItemCode</span></td>
-                <td>@item.ItemName</td>
-                <td>@item.Description</td>
-                <td>@item.Size</td>
-                <td>₱ @item.Amount</td>
-                <td>@item.Quantity</td>
-                <td>@item.Category.CatName</td>
-
-                <td>
-                    <a asp-action="Edit"
-                       asp-route-id="@item.ItemID"
-                       class="btn btn-sm btn-warning">
-                        Edit
-                    </a>
-                </td>
-
-            </tr>
-        }
-    </tbody>
-
-</table>
+    <div class="alert alert-light border mt-3">
+        <strong>Item photos:</strong>
+        put each photo in <code>wwwroot/Images/Items/&lt;CatID&gt;/&lt;ItemCode&gt;.jpg</code>.
+        Example: <code>wwwroot/Images/Items/1/GOW-001.jpg</code>.
+    </div>
+</div>

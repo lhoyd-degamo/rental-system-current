@@ -1,0 +1,101 @@
+@model CRUD.Models.Borrow
+@{
+    ViewData["Title"] = "Return Inspection";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border bg-white">
+                <div class="card-body p-4">
+                    <h2>Return Inspection</h2>
+                    <p class="text-muted">Check the item before completing the return.</p>
+
+                    <div class="border p-3 mb-4">
+                        <div><strong>Booking:</strong> #@Model.BorrowID</div>
+                        <div><strong>Customer:</strong> @Model.Customer?.CustomerName</div>
+                        <div><strong>Expected Return:</strong> @Model.ReturnDate.ToString("MM/dd/yyyy")</div>
+                        <div class="mt-2"><strong>Items:</strong></div>
+                        @foreach (var bi in Model.BorrowItems)
+                        {
+                            <div>@bi.Item?.ItemName — Size @bi.Item?.Size</div>
+                        }
+                    </div>
+
+                    <form asp-action="ReturnBorrow" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.BorrowID" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Actual Return Date</label>
+                            <input id="actualReturnDate" type="date" name="actualReturnDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Item Condition</label>
+                            <select name="itemCondition" class="form-select" required>
+                                <option value="Good">Good</option>
+                                <option value="Minor Damage">Minor Damage</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Damage Description</label>
+                            <textarea name="damageDescription" class="form-control" rows="3" placeholder="Write N/A if there is no damage."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Damage Penalty</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₱</span>
+                                <input id="damagePenalty" type="number" name="damagePenalty" class="form-control" min="0" step="0.01" value="0" />
+                            </div>
+                        </div>
+
+                        <div class="border p-3 bg-light mb-4">
+                            <div>Late days: <strong id="lateDays">0</strong></div>
+                            <div>Late penalty: <strong>₱<span id="latePenalty">0.00</span></strong></div>
+                            <div>Damage penalty: <strong>₱<span id="damageTotal">0.00</span></strong></div>
+                            <hr />
+                            <div>Total penalty: <strong>₱<span id="totalPenalty">0.00</span></strong></div>
+                            <small class="text-muted">Late penalty is ₱50 per late day.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark">CONFIRM RETURN</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">CANCEL</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const expectedReturn = new Date('@Model.ReturnDate.ToString("yyyy-MM-dd")T00:00:00');
+    const actualInput = document.getElementById('actualReturnDate');
+    const damageInput = document.getElementById('damagePenalty');
+
+    function updatePenalty() {
+        const actual = new Date(actualInput.value + 'T00:00:00');
+        let days = 0;
+
+        if (!isNaN(actual.getTime()) && actual > expectedReturn) {
+            days = Math.floor((actual - expectedReturn) / 86400000);
+        }
+
+        const late = days * 50;
+        const damage = Number(damageInput.value) || 0;
+
+        document.getElementById('lateDays').textContent = days;
+        document.getElementById('latePenalty').textContent = late.toFixed(2);
+        document.getElementById('damageTotal').textContent = damage.toFixed(2);
+        document.getElementById('totalPenalty').textContent = (late + damage).toFixed(2);
+    }
+
+    actualInput.addEventListener('change', updatePenalty);
+    damageInput.addEventListener('input', updatePenalty);
+    updatePenalty();
+</script>
+}
