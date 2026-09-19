@@ -22,6 +22,8 @@ namespace CRUD.Data
         public DbSet<BorrowItem> BorrowItems { get; set; }
         public DbSet<UserModel> Users { get; set; }
         public DbSet<Penalty> Penalties { get; set; }
+        public DbSet<Reservation> Reservation { get; set; }
+        public DbSet<ReservationItems> ReservationItems{ get; set; }
 
         protected override void OnModelCreating(
            ModelBuilder modelBuilder)
