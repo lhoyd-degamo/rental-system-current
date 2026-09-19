@@ -21,6 +21,14 @@ namespace CRUD.Models
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; } = "";
 
-        public ICollection<Borrow> Borrows { get; set; } = new List<Borrow>();
+        // Customer identification
+        [Required(ErrorMessage = "ID type is required")]
+        public string IDType { get; set; } = "";
+
+        [Required(ErrorMessage = "ID number is required")]
+        public string IDNumber { get; set; } = "";
+
+        public ICollection<Borrow> Borrows { get; set; }
+            = new List<Borrow>();
     }
 }

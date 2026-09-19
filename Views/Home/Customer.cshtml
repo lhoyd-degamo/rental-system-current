@@ -37,10 +37,33 @@
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label asp-for="Address" class="form-label">Address</label>
                         <textarea asp-for="Address" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <!-- ID Information -->
+                    <div class="mb-3">
+                        <label asp-for="IDType" class="form-label">ID Type</label>
+                        <select asp-for="IDType" class="form-select">
+                            <option value="">-- Select ID Type --</option>
+                            <option value="Driver's License">Driver's License</option>
+                            <option value="Passport">Passport</option>
+                            <option value="National ID">National ID</option>
+                            <option value="UMID">UMID</option>
+                            <option value="PhilHealth ID">PhilHealth ID</option>
+                            <option value="Postal ID">Postal ID</option>
+                            <option value="School ID">School ID</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="IDType" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="IDNumber" class="form-label">ID Number</label>
+                        <input asp-for="IDNumber" class="form-control" />
+                        <span asp-validation-for="IDNumber" class="text-danger"></span>
                     </div>
 
                     <button type="submit" class="btn btn-dark w-100">CONTINUE</button>

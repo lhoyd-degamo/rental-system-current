@@ -86,14 +86,20 @@ namespace CRUD.Controllers
                 existing.CustomerName = customer.CustomerName;
                 existing.PhoneNumber = customer.PhoneNumber;
                 existing.Address = customer.Address;
+
+                // Update customer's ID information
+                existing.IDType = customer.IDType;
+                existing.IDNumber = customer.IDNumber;
+
                 await _context.SaveChangesAsync();
+
                 customer = existing;
             }
 
             HttpContext.Session.SetInt32("CustomerID", customer.CustomerID);
+
             return RedirectToAction(nameof(CustomerDashboard));
         }
-
         public async Task<IActionResult> CustomerDashboard()
         {
             var customerID = HttpContext.Session.GetInt32("CustomerID");

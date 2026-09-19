@@ -77,11 +77,33 @@ namespace CRUD.Controllers
             if (borrow.SelectedItemIDs == null || borrow.SelectedItemIDs.Count == 0)
                 ModelState.AddModelError("", "Please add at least one item.");
 
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerName))
+                ModelState.AddModelError("NewCustomerName", "Customer name is required.");
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerEmail))
+                ModelState.AddModelError("NewCustomerEmail", "Customer email is required.");
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerPhone))
+                ModelState.AddModelError("NewCustomerPhone", "Customer phone number is required.");
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerAddress))
+                ModelState.AddModelError("NewCustomerAddress", "Customer address is required.");
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDType))
+                ModelState.AddModelError("NewCustomerIDType", "ID type is required.");
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDNumber))
+                ModelState.AddModelError("NewCustomerIDNumber", "ID number is required.");
+
             if (borrow.BorrowDate.Date > DateTime.Today)
-                ModelState.AddModelError("BorrowDate", "Borrow date cannot be a future date.");
+                ModelState.AddModelError(
+                    "BorrowDate",
+                    "Borrow date cannot be a future date.");
 
             if (borrow.ReturnDate.Date < borrow.BorrowDate.Date)
-                ModelState.AddModelError("ReturnDate", "Return date cannot be earlier than the borrow date.");
+                ModelState.AddModelError(
+                    "ReturnDate",
+                    "Return date cannot be earlier than the borrow date.");
 
             if (!ModelState.IsValid)
             {
@@ -89,27 +111,40 @@ namespace CRUD.Controllers
                 return View(borrow);
             }
 
-            var selectedIDs = borrow.SelectedItemIDs.Distinct().ToList();
+            var selectedIDs = (borrow.SelectedItemIDs ?? new List<int>())
+                .Distinct()
+                .ToList();
+
             var selectedItems = await _context.Items
                 .Where(i => selectedIDs.Contains(i.ItemID))
                 .ToListAsync();
 
             if (selectedItems.Count != selectedIDs.Count)
             {
-                ModelState.AddModelError("", "One or more selected items could not be found.");
+                ModelState.AddModelError(
+                    "",
+                    "One or more selected items could not be found.");
+
                 await LoadAvailableItems();
                 return View(borrow);
             }
 
-            if (selectedItems.Any(i => i.Quantity <= 0 || i.Status != "Available"))
+            if (selectedItems.Any(i =>
+                i.Quantity <= 0 ||
+                i.Status != "Available"))
             {
-                ModelState.AddModelError("", "One or more selected items are no longer available.");
+                ModelState.AddModelError(
+                    "",
+                    "One or more selected items are no longer available.");
+
                 await LoadAvailableItems();
                 return View(borrow);
             }
 
+            // Find existing customer using email
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == borrow.NewCustomerEmail);
+                .FirstOrDefaultAsync(c =>
+                    c.Email == borrow.NewCustomerEmail);
 
             if (customer == null)
             {
@@ -118,8 +153,11 @@ namespace CRUD.Controllers
                     CustomerName = borrow.NewCustomerName,
                     Email = borrow.NewCustomerEmail,
                     PhoneNumber = borrow.NewCustomerPhone,
-                    Address = borrow.NewCustomerAddress
+                    Address = borrow.NewCustomerAddress,
+                    IDType = borrow.NewCustomerIDType,
+                    IDNumber = borrow.NewCustomerIDNumber
                 };
+
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
             }
@@ -128,6 +166,10 @@ namespace CRUD.Controllers
                 customer.CustomerName = borrow.NewCustomerName;
                 customer.PhoneNumber = borrow.NewCustomerPhone;
                 customer.Address = borrow.NewCustomerAddress;
+                customer.IDType = borrow.NewCustomerIDType;
+                customer.IDNumber = borrow.NewCustomerIDNumber;
+
+                await _context.SaveChangesAsync();
             }
 
             borrow.CustomerID = customer.CustomerID;
@@ -147,12 +189,17 @@ namespace CRUD.Controllers
                 });
 
                 item.Quantity -= 1;
-                item.Status = item.Quantity > 0 ? "Available" : "Borrowed";
+                item.Status = item.Quantity > 0
+                    ? "Available"
+                    : "Borrowed";
             }
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Create", "Payment", new { borrowId = borrow.BorrowID });
+            return RedirectToAction(
+                "Create",
+                "Payment",
+                new { borrowId = borrow.BorrowID });
         }
 
         // CUSTOMER: booking page for one selected item
@@ -171,8 +218,12 @@ namespace CRUD.Controllers
 
             if (item.Quantity <= 0 || item.Status != "Available")
             {
-                TempData["Error"] = "This item is currently unavailable.";
-                return RedirectToAction("CustomerDashboard", "Home");
+                TempData["Error"] =
+                    "This item is currently unavailable.";
+
+                return RedirectToAction(
+                    "CustomerDashboard",
+                    "Home");
             }
 
             ViewBag.Item = item;
@@ -185,7 +236,8 @@ namespace CRUD.Controllers
             });
         }
 
-        // CUSTOMER: save online booking only. Stock is NOT reduced here.
+        // CUSTOMER: save online booking only.
+        // Stock is NOT reduced here.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(Borrow borrow)
@@ -193,7 +245,9 @@ namespace CRUD.Controllers
             if (!IsCustomer())
                 return RedirectToAction("Customer", "Home");
 
-            var customerID = HttpContext.Session.GetInt32("CustomerID");
+            var customerID =
+                HttpContext.Session.GetInt32("CustomerID");
+
             if (customerID == null)
                 return RedirectToAction("Customer", "Home");
 
@@ -201,10 +255,18 @@ namespace CRUD.Controllers
             ModelState.Remove("Customer");
 
             if (borrow.BorrowDate.Date < DateTime.Today)
-                ModelState.AddModelError("BorrowDate", "Borrow date cannot be in the past.");
+            {
+                ModelState.AddModelError(
+                    "BorrowDate",
+                    "Borrow date cannot be in the past.");
+            }
 
             if (borrow.ReturnDate.Date < borrow.BorrowDate.Date)
-                ModelState.AddModelError("ReturnDate", "Return date cannot be earlier than the borrow date.");
+            {
+                ModelState.AddModelError(
+                    "ReturnDate",
+                    "Return date cannot be earlier than the borrow date.");
+            }
 
             var item = await _context.Items
                 .Include(i => i.Category)
@@ -214,7 +276,11 @@ namespace CRUD.Controllers
                 return NotFound();
 
             if (item.Quantity <= 0 || item.Status != "Available")
-                ModelState.AddModelError("", "This item is currently unavailable.");
+            {
+                ModelState.AddModelError(
+                    "",
+                    "This item is currently unavailable.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -238,8 +304,12 @@ namespace CRUD.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Booking #{borrow.BorrowID} was submitted successfully.";
-            return RedirectToAction("CustomerDashboard", "Home");
+            TempData["Success"] =
+                $"Booking #{borrow.BorrowID} was submitted successfully.";
+
+            return RedirectToAction(
+                "CustomerDashboard",
+                "Home");
         }
 
         // ADMIN: edit booking/rental
@@ -261,25 +331,43 @@ namespace CRUD.Controllers
             if (borrow == null)
                 return NotFound();
 
+            // Load customer information into the helper fields
             if (borrow.Customer != null)
             {
-                borrow.NewCustomerName = borrow.Customer.CustomerName;
-                borrow.NewCustomerEmail = borrow.Customer.Email;
-                borrow.NewCustomerPhone = borrow.Customer.PhoneNumber;
-                borrow.NewCustomerAddress = borrow.Customer.Address;
+                borrow.NewCustomerName =
+                    borrow.Customer.CustomerName;
+
+                borrow.NewCustomerEmail =
+                    borrow.Customer.Email;
+
+                borrow.NewCustomerPhone =
+                    borrow.Customer.PhoneNumber;
+
+                borrow.NewCustomerAddress =
+                    borrow.Customer.Address;
+
+                borrow.NewCustomerIDType =
+                    borrow.Customer.IDType;
+
+                borrow.NewCustomerIDNumber =
+                    borrow.Customer.IDNumber;
             }
 
             borrow.SelectedItemIDs = borrow.BorrowItems
                 .Select(bi => bi.ItemID)
                 .ToList();
 
-            await LoadItemsForEdit(borrow.SelectedItemIDs);
+            await LoadItemsForEdit(
+                borrow.SelectedItemIDs);
+
             return View(borrow);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Borrow borrow)
+        public async Task<IActionResult> Edit(
+            int id,
+            Borrow borrow)
         {
             if (!IsAdmin())
                 return RedirectToAction("Index", "Home");
@@ -291,14 +379,69 @@ namespace CRUD.Controllers
             ModelState.Remove("Item");
             ModelState.Remove("Customer");
 
-            if (borrow.SelectedItemIDs == null || borrow.SelectedItemIDs.Count == 0)
-                ModelState.AddModelError("", "Please select at least one item.");
+            if (borrow.SelectedItemIDs == null ||
+                borrow.SelectedItemIDs.Count == 0)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Please select at least one item.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerName))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerName",
+                    "Customer name is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerEmail))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerEmail",
+                    "Customer email is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerPhone))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerPhone",
+                    "Customer phone number is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerAddress))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerAddress",
+                    "Customer address is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDType))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerIDType",
+                    "ID type is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(borrow.NewCustomerIDNumber))
+            {
+                ModelState.AddModelError(
+                    "NewCustomerIDNumber",
+                    "ID number is required.");
+            }
 
             if (borrow.BorrowDate.Date > DateTime.Today)
-                ModelState.AddModelError("BorrowDate", "Borrow date cannot be a future date.");
+            {
+                ModelState.AddModelError(
+                    "BorrowDate",
+                    "Borrow date cannot be a future date.");
+            }
 
             if (borrow.ReturnDate.Date < borrow.BorrowDate.Date)
-                ModelState.AddModelError("ReturnDate", "Return date cannot be earlier than the borrow date.");
+            {
+                ModelState.AddModelError(
+                    "ReturnDate",
+                    "Return date cannot be earlier than the borrow date.");
+            }
 
             var existingBorrow = await _context.Borrows
                 .Include(b => b.Customer)
@@ -308,7 +451,11 @@ namespace CRUD.Controllers
             if (existingBorrow == null)
                 return NotFound();
 
-            var newIDs = (borrow.SelectedItemIDs ?? new List<int>()).Distinct().ToList();
+            var newIDs = (borrow.SelectedItemIDs ??
+                          new List<int>())
+                .Distinct()
+                .ToList();
+
             var newItems = await _context.Items
                 .Where(i => newIDs.Contains(i.ItemID))
                 .ToListAsync();
@@ -322,18 +469,27 @@ namespace CRUD.Controllers
                 .Where(i => oldIDs.Contains(i.ItemID))
                 .ToListAsync();
 
-            if (!ModelState.IsValid || newItems.Count != newIDs.Count)
+            if (!ModelState.IsValid ||
+                newItems.Count != newIDs.Count)
             {
                 if (newItems.Count != newIDs.Count)
-                    ModelState.AddModelError("", "One or more selected items could not be found.");
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "One or more selected items could not be found.");
+                }
 
                 await LoadItemsForEdit(newIDs);
                 return View(borrow);
             }
 
-            bool wasBorrowed = existingBorrow.Status == "Borrowed";
-            bool willBeBorrowed = borrow.Status == "Borrowed";
+            bool wasBorrowed =
+                existingBorrow.Status == "Borrowed";
 
+            bool willBeBorrowed =
+                borrow.Status == "Borrowed";
+
+            // Return old stock first if the existing rental was borrowed
             if (wasBorrowed)
             {
                 foreach (var item in oldItems)
@@ -343,12 +499,17 @@ namespace CRUD.Controllers
                 }
             }
 
+            // Check new stock
             if (willBeBorrowed)
             {
                 foreach (var item in newItems)
                 {
                     if (item.Quantity <= 0)
-                        ModelState.AddModelError("", $"{item.ItemName} is out of stock.");
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            $"{item.ItemName} is out of stock.");
+                    }
                 }
 
                 if (!ModelState.IsValid)
@@ -358,25 +519,48 @@ namespace CRUD.Controllers
                 }
             }
 
+            // Update customer information
             if (existingBorrow.Customer != null)
             {
-                existingBorrow.Customer.CustomerName = borrow.NewCustomerName;
-                existingBorrow.Customer.Email = borrow.NewCustomerEmail;
-                existingBorrow.Customer.PhoneNumber = borrow.NewCustomerPhone;
-                existingBorrow.Customer.Address = borrow.NewCustomerAddress;
+                existingBorrow.Customer.CustomerName =
+                    borrow.NewCustomerName;
+
+                existingBorrow.Customer.Email =
+                    borrow.NewCustomerEmail;
+
+                existingBorrow.Customer.PhoneNumber =
+                    borrow.NewCustomerPhone;
+
+                existingBorrow.Customer.Address =
+                    borrow.NewCustomerAddress;
+
+                existingBorrow.Customer.IDType =
+                    borrow.NewCustomerIDType;
+
+                existingBorrow.Customer.IDNumber =
+                    borrow.NewCustomerIDNumber;
             }
 
-            existingBorrow.IDType = borrow.IDType;
-            existingBorrow.IDNumber = borrow.IDNumber;
-            existingBorrow.BorrowDate = borrow.BorrowDate;
-            existingBorrow.ReturnDate = borrow.ReturnDate;
-            existingBorrow.Status = borrow.Status;
+            // Update borrow information
+            existingBorrow.BorrowDate =
+                borrow.BorrowDate;
+
+            existingBorrow.ReturnDate =
+                borrow.ReturnDate;
+
+            existingBorrow.Status =
+                borrow.Status;
+
             existingBorrow.Quantity = 1;
 
-            _context.BorrowItems.RemoveRange(existingBorrow.BorrowItems);
+            _context.BorrowItems.RemoveRange(
+                existingBorrow.BorrowItems);
 
             if (newItems.Any())
-                existingBorrow.ItemID = newItems.First().ItemID;
+            {
+                existingBorrow.ItemID =
+                    newItems.First().ItemID;
+            }
 
             foreach (var item in newItems)
             {
@@ -389,11 +573,15 @@ namespace CRUD.Controllers
                 if (willBeBorrowed)
                 {
                     item.Quantity -= 1;
-                    item.Status = item.Quantity > 0 ? "Available" : "Borrowed";
+
+                    item.Status = item.Quantity > 0
+                        ? "Available"
+                        : "Borrowed";
                 }
             }
 
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -416,7 +604,9 @@ namespace CRUD.Controllers
 
             if (borrow.Status != "Borrowed")
             {
-                TempData["Info"] = "Only borrowed items can be returned.";
+                TempData["Info"] =
+                    "Only borrowed items can be returned.";
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -442,40 +632,51 @@ namespace CRUD.Controllers
 
             if (borrow.Status == "Returned")
             {
-                TempData["Info"] = "This booking has already been returned.";
+                TempData["Info"] =
+                    "This booking has already been returned.";
+
                 return RedirectToAction(nameof(Index));
             }
 
-            if (actualReturnDate.Date < borrow.BorrowDate.Date)
+            if (actualReturnDate.Date <
+                borrow.BorrowDate.Date)
             {
                 TempData["Error"] =
                     "Actual return date cannot be earlier than the borrow date.";
 
-                return RedirectToAction(nameof(ReturnBorrow), new { id });
+                return RedirectToAction(
+                    nameof(ReturnBorrow),
+                    new { id });
             }
 
-            if (actualReturnDate.Date > DateTime.Today)
+            if (actualReturnDate.Date >
+                DateTime.Today)
             {
                 TempData["Error"] =
                     "Actual return date cannot be a future date.";
 
-                return RedirectToAction(nameof(ReturnBorrow), new { id });
+                return RedirectToAction(
+                    nameof(ReturnBorrow),
+                    new { id });
             }
 
-            // Calculate how many days late
+            // Calculate late days
             int daysLate = 0;
 
-            if (actualReturnDate.Date > borrow.ReturnDate.Date)
+            if (actualReturnDate.Date >
+                borrow.ReturnDate.Date)
             {
                 daysLate =
-                    (actualReturnDate.Date - borrow.ReturnDate.Date).Days;
+                    (actualReturnDate.Date -
+                     borrow.ReturnDate.Date).Days;
             }
 
-            // ₱50 penalty for every late day
+            // ₱50 penalty per late day
             decimal penaltyPerDay = 50m;
-            decimal penaltyAmount = daysLate * penaltyPerDay;
 
-            // Create penalty record
+            decimal penaltyAmount =
+                daysLate * penaltyPerDay;
+
             var penalty = new Penalty
             {
                 BorrowID = borrow.BorrowID,
@@ -486,7 +687,6 @@ namespace CRUD.Controllers
 
             _context.Penalties.Add(penalty);
 
-            // Change rental status
             borrow.Status = "Returned";
 
             // Return item stock
@@ -558,7 +758,10 @@ namespace CRUD.Controllers
             {
                 if (borrow.Status == "Borrowed")
                 {
-                    var itemIDs = borrow.BorrowItems.Select(bi => bi.ItemID).ToList();
+                    var itemIDs = borrow.BorrowItems
+                        .Select(bi => bi.ItemID)
+                        .ToList();
+
                     var items = await _context.Items
                         .Where(i => itemIDs.Contains(i.ItemID))
                         .ToListAsync();
@@ -575,7 +778,10 @@ namespace CRUD.Controllers
                     .ToListAsync();
 
                 _context.Payments.RemoveRange(payments);
-                _context.BorrowItems.RemoveRange(borrow.BorrowItems);
+
+                _context.BorrowItems.RemoveRange(
+                    borrow.BorrowItems);
+
                 _context.Borrows.Remove(borrow);
 
                 await _context.SaveChangesAsync();
@@ -588,17 +794,21 @@ namespace CRUD.Controllers
         {
             ViewBag.Items = await _context.Items
                 .Include(i => i.Category)
-                .Where(i => i.Status == "Available" && i.Quantity > 0)
+                .Where(i =>
+                    i.Status == "Available" &&
+                    i.Quantity > 0)
                 .OrderBy(i => i.ItemName)
                 .ToListAsync();
         }
 
-        private async Task LoadItemsForEdit(List<int> selectedItemIDs)
+        private async Task LoadItemsForEdit(
+            List<int> selectedItemIDs)
         {
             ViewBag.Items = await _context.Items
                 .Include(i => i.Category)
                 .Where(i =>
-                    (i.Status == "Available" && i.Quantity > 0) ||
+                    (i.Status == "Available" &&
+                     i.Quantity > 0) ||
                     selectedItemIDs.Contains(i.ItemID))
                 .OrderBy(i => i.ItemName)
                 .ToListAsync();

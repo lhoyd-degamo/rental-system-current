@@ -21,12 +21,6 @@ namespace CRUD.Models
         public ICollection<BorrowItem> BorrowItems { get; set; }
             = new List<BorrowItem>();
 
-        [Required(ErrorMessage = "ID type is required")]
-        public string IDType { get; set; } = "";
-
-        [Required(ErrorMessage = "ID number is required")]
-        public string IDNumber { get; set; } = "";
-
         public DateTime BorrowDate { get; set; } = DateTime.Today;
 
         public DateTime ReturnDate { get; set; } = DateTime.Today.AddDays(1);
@@ -52,6 +46,12 @@ namespace CRUD.Models
 
         [NotMapped]
         public string NewCustomerAddress { get; set; } = "";
+
+        [NotMapped]
+        public string NewCustomerIDType { get; set; } = "";
+
+        [NotMapped]
+        public string NewCustomerIDNumber { get; set; } = "";
 
         [NotMapped]
         public string PhoneNumber
