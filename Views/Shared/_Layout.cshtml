@@ -1,127 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Pearls & More</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - Pearls & More
+    </title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
 </head>
+
 
 <body>
 
 @{
-    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
-    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    // =========================================
+    // CURRENT PAGE
+    // =========================================
+
+    var controller =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var action =
+        ViewContext.RouteData.Values["action"]?.ToString();
+
+
+    // =========================================
+    // LOGIN STATUS
+    // =========================================
+
+    var isAdminLoggedIn =
+        Context.Session.GetString("AdminUser") != null;
+
+    var isCustomerLoggedIn =
+        Context.Session.GetInt32("CustomerID") != null;
+
+    var isLoggedIn =
+        isAdminLoggedIn || isCustomerLoggedIn;
+
+
+    // =========================================
+    // HOME PAGE
+    // =========================================
 
     var isHomePage =
         controller == "Home" &&
         action == "Index";
+
+
+    // =========================================
+    // SHOW SIDEBAR
+    // =========================================
+
+    var showSidebar =
+        isLoggedIn || !isHomePage;
 }
 
-@if (!isHomePage)
+
+@if (showSidebar)
 {
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR TOGGLE -->
+    <!-- ========================================= -->
+
     <button id="sidebarToggle"
             class="toggle-btn"
             type="button">
+
         ☰
+
     </button>
+
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================================= -->
 
     <div id="sidebar"
          class="sidebar">
 
+
+        <!-- CLOSE BUTTON -->
+
         <button id="sidebarClose"
                 class="close-btn"
                 type="button">
+
             ×
+
         </button>
 
+
+        <!-- LOGO -->
+
         <div class="logo">
+
             PEARLS & MORE
+
         </div>
+
 
         <hr />
 
+
+        <!-- ========================================= -->
+        <!-- MENU -->
+        <!-- ========================================= -->
+
         <div class="menu">
+
+
+            <!-- HOME -->
 
             <a asp-controller="Home"
                asp-action="Index">
+
                 Home
+
             </a>
 
-            @if (Context.Session.GetString("AdminUser") != null)
+
+            <!-- ========================================= -->
+            <!-- ADMIN MENU -->
+            <!-- ========================================= -->
+
+            @if (isAdminLoggedIn)
             {
+
                 <a asp-controller="Admin"
                    asp-action="Dashboard">
+
                     Dashboard
+
                 </a>
+
 
                 <a asp-controller="Item"
                    asp-action="Index">
+
                     Items
+
                 </a>
+
 
                 <a asp-controller="Category"
                    asp-action="Index">
+
                     Categories
+
                 </a>
+
 
                 <a asp-controller="Borrow"
                    asp-action="Index">
+
                     Bookings / Rentals
+
                 </a>
+
 
                 <a asp-controller="Payment"
                    asp-action="Index">
+
                     Payments
+
                 </a>
 
-                <!-- REPORTS -->
+
                 <a asp-controller="Report"
                    asp-action="Index">
+
                     Reports
+
                 </a>
+
 
                 <a asp-controller="Admin"
                    asp-action="ChangePassword">
+
                     Change Password
+
                 </a>
+
+
+                <!-- ADMIN LOGOUT -->
 
                 <a asp-controller="Admin"
-                   asp-action="Logout">
+                   asp-action="Logout"
+                   onclick="return confirmLogout();">
+
                     Logout
-                </a>
-            }
-            else if (Context.Session.GetInt32("CustomerID") != null)
-            {
-                <a asp-controller="Home"
-                   asp-action="CustomerDashboard">
-                    My Dashboard
+
                 </a>
 
+            }
+
+
+            <!-- ========================================= -->
+            <!-- CUSTOMER MENU -->
+            <!-- ========================================= -->
+
+            @if (isCustomerLoggedIn)
+            {
+
                 <a asp-controller="Home"
-                   asp-action="CustomerLogout">
-                    Logout
+                   asp-action="CustomerDashboard">
+
+                    My Dashboard
+
                 </a>
+
+
+                <!-- CUSTOMER LOGOUT -->
+
+                <a asp-controller="Home"
+                   asp-action="CustomerLogout"
+                   onclick="return confirmLogout();">
+
+                    Logout
+
+                </a>
+
             }
 
         </div>
+
     </div>
+
 }
 
+
+<!-- ========================================= -->
+<!-- MAIN CONTENT -->
+<!-- ========================================= -->
+
 <div id="main"
-     class="main @(isHomePage ? "home-main" : "")">
+     class="main @(isHomePage && !isLoggedIn ? "home-main" : "")">
 
     @RenderBody()
 
 </div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
 
-@await RenderSectionAsync("Scripts", required: false)
+<!-- ========================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================= -->
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="~/js/site.js"
+        asp-append-version="true">
+</script>
+
+
+<script>
+
+    function confirmLogout() {
+
+        return confirm("Do you want to log out?");
+
+    }
+
+</script>
+
+
+@await RenderSectionAsync(
+    "Scripts",
+    required: false)
 
 </body>
+
 </html>

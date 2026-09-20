@@ -1,92 +1,330 @@
 ﻿@model CRUD.Models.Item
 
-<h2>Edit Item</h2>
+@{
+    ViewData["Title"] = "Edit Item";
+}
 
-<form asp-action="Edit" method="post">
+<div class="container-fluid py-4">
 
-    <input type="hidden" asp-for="ItemID" />
-    <input type="hidden" asp-for="ItemCode" />
+    <a asp-action="Index"
+       class="btn btn-outline-secondary mb-3">
+        Back
+    </a>
 
-    <div class="mb-3">
-        <label>Item Code</label>
-        <input value="@Model.ItemCode" class="form-control" readonly />
-    </div>
 
-    <div class="mb-3">
-        <label>Item Name</label>
-        <input asp-for="ItemName" class="form-control" />
-    </div>
+    <div class="row justify-content-center">
 
-    <div class="mb-3">
-        <label>Description</label>
-        <input asp-for="Description" class="form-control" />
-    </div>
+        <div class="col-lg-9">
 
-    <div class="mb-3">
-        <label>Amount</label>
-        <input asp-for="Amount" class="form-control" />
-    </div>
+            <div class="card border bg-white">
 
-    <div class="mb-3">
-        <label asp-for="Size"></label>
-        <select asp-for="Size" class="form-control">
-            <option value="">Select Size</option>
-            <option>Small</option>
-            <option>Medium</option>
-            <option>Large</option>
-        </select>
-        <span asp-validation-for="Size" class="text-danger"></span>
-    </div>
+                <div class="card-body p-4">
 
-    <div class="mb-3">
-        <label asp-for="Quantity"></label>
-        <input asp-for="Quantity"
-               class="form-control"
-               type="number"
-               min="1" />
-        <span asp-validation-for="Quantity" class="text-danger"></span>
-    </div>
-    
+                    <h2>
+                        Edit Item
+                    </h2>
 
-    <div class="mb-3">
-        <label asp-for="CatID" class="form-label">Category</label>
+                    <p class="text-muted">
+                        Update the item information.
+                    </p>
 
-        <select asp-for="CatID"
-                asp-items="ViewBag.Categories"
-                class="form-select">
-        </select>
-    </div>
 
-    <div class="d-flex justify-content-between">
+                    <form asp-action="Edit"
+                          method="post"
+                          enctype="multipart/form-data">
 
-        <a asp-action="Index" class="btn btn-secondary">
-            Back
-        </a>
+                        @Html.AntiForgeryToken()
 
-        <div>
+                        <input type="hidden"
+                               asp-for="ItemID" />
 
-            <button type="submit" class="btn btn-primary">
-                Save Changes
-            </button>
+                        <input type="hidden"
+                               asp-for="ItemCode" />
 
-            <button type="button"
-                    class="btn btn-danger ms-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteModal">
-                Delete
-            </button>
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+
+                        <div class="row g-4">
+
+
+                            <!-- LEFT -->
+
+                            <div class="col-md-7">
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+                                        Item Code
+                                    </label>
+
+                                    <input value="@Model.ItemCode"
+                                           class="form-control"
+                                           readonly />
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="ItemName"
+                                           class="form-label">
+                                        Item Name
+                                    </label>
+
+                                    <input asp-for="ItemName"
+                                           class="form-control" />
+
+                                    <span asp-validation-for="ItemName"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="Description"
+                                           class="form-label">
+                                        Description
+                                    </label>
+
+                                    <textarea asp-for="Description"
+                                              class="form-control"
+                                              rows="4"></textarea>
+
+                                    <span asp-validation-for="Description"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="Amount"
+                                           class="form-label">
+                                        Rental Price
+                                    </label>
+
+                                    <input asp-for="Amount"
+                                           class="form-control"
+                                           type="number"
+                                           min="0.01"
+                                           step="0.01" />
+
+                                    <span asp-validation-for="Amount"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="Size"
+                                           class="form-label">
+                                        Size
+                                    </label>
+
+                                    <select asp-for="Size"
+                                            class="form-select">
+
+                                        <option value="">
+                                            Select Size
+                                        </option>
+
+                                        <option value="XS">XS</option>
+                                        <option value="Small">Small</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Large">Large</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+
+                                    </select>
+
+                                    <span asp-validation-for="Size"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="Quantity"
+                                           class="form-label">
+                                        Quantity
+                                    </label>
+
+                                    <input asp-for="Quantity"
+                                           class="form-control"
+                                           type="number"
+                                           min="1" />
+
+                                    <span asp-validation-for="Quantity"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <label asp-for="CatID"
+                                           class="form-label">
+                                        Category
+                                    </label>
+
+                                    <select asp-for="CatID"
+                                            asp-items="ViewBag.Categories"
+                                            class="form-select">
+                                    </select>
+
+                                    <span asp-validation-for="CatID"
+                                          class="text-danger">
+                                    </span>
+
+                                </div>
+
+
+                                <!-- NEW IMAGE -->
+
+                                <div class="mb-3">
+
+                                    <label for="ImageFile"
+                                           class="form-label">
+                                        Change Image
+                                    </label>
+
+                                    <input type="file"
+                                           id="ImageFile"
+                                           name="ImageFile"
+                                           class="form-control"
+                                           accept="image/jpeg,image/png,image/webp" />
+
+                                    <div class="form-text">
+                                        Leave empty to keep the current image.
+                                    </div>
+
+                                    <div id="imageError"
+                                         class="text-danger small">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RIGHT -->
+
+                            <div class="col-md-5">
+
+                                <label class="form-label">
+                                    Item Image
+                                </label>
+
+
+                                <div class="border rounded bg-light"
+                                     style="
+                                        width:100%;
+                                        height:420px;
+                                        overflow:hidden;
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;">
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        Model.ImagePath))
+                                    {
+                                        <img id="imagePreview"
+                                             src="@Model.ImagePath"
+                                             alt="@Model.ItemName"
+                                             style="
+                                                width:100%;
+                                                height:100%;
+                                                object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div id="noImage"
+                                             class="text-center">
+
+                                            <div style="font-size:60px;">
+                                                🖼️
+                                            </div>
+
+                                            <p class="text-muted">
+                                                No image
+                                            </p>
+
+                                        </div>
+
+                                        <img id="imagePreview"
+                                             style="
+                                                display:none;
+                                                width:100%;
+                                                height:100%;
+                                                object-fit:cover;" />
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <hr class="my-4" />
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Index"
+                               class="btn btn-secondary">
+                                Back
+                            </a>
+
+
+                            <div>
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+                                    Save Changes
+                                </button>
+
+
+                                <button type="button"
+                                        class="btn btn-danger ms-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal">
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
-</form>
+</div>
+
 
 <!-- DELETE MODAL -->
+
 <div class="modal fade"
      id="deleteModal"
-     tabindex="-1"
-     aria-hidden="true">
+     tabindex="-1">
 
     <div class="modal-dialog">
 
@@ -105,6 +343,7 @@
 
             </div>
 
+
             <div class="modal-body">
 
                 <p>
@@ -114,6 +353,7 @@
 
             </div>
 
+
             <div class="modal-footer">
 
                 <button type="button"
@@ -121,6 +361,7 @@
                         data-bs-dismiss="modal">
                     Cancel
                 </button>
+
 
                 <form asp-action="Delete"
                       asp-route-id="@Model.ItemID"
@@ -142,3 +383,99 @@
     </div>
 
 </div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const fileInput =
+                document.getElementById("ImageFile");
+
+            const preview =
+                document.getElementById("imagePreview");
+
+            const noImage =
+                document.getElementById("noImage");
+
+            const error =
+                document.getElementById("imageError");
+
+
+            if (!fileInput) {
+                return;
+            }
+
+
+            fileInput.addEventListener("change", function () {
+
+                error.textContent = "";
+
+                const file = this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+
+                if (!allowedTypes.includes(file.type)) {
+
+                    error.textContent =
+                        "Please select a JPG, PNG, or WEBP image.";
+
+                    this.value = "";
+
+                    return;
+                }
+
+
+                if (file.size > 5 * 1024 * 1024) {
+
+                    error.textContent =
+                        "Image must not exceed 5 MB.";
+
+                    this.value = "";
+
+                    return;
+                }
+
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload = function (event) {
+
+                    preview.src =
+                        event.target.result;
+
+                    preview.style.display =
+                        "block";
+
+                    if (noImage) {
+                        noImage.style.display =
+                            "none";
+                    }
+
+                };
+
+
+                reader.readAsDataURL(file);
+
+            });
+
+        });
+
+    </script>
+}

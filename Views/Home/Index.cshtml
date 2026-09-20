@@ -1,6 +1,16 @@
 @model IEnumerable<CRUD.Models.Category>
+
 @{
     ViewData["Title"] = "Home";
+
+    var isAdminLoggedIn =
+        Context.Session.GetString("AdminUser") != null;
+
+    var isCustomerLoggedIn =
+        Context.Session.GetInt32("CustomerID") != null;
+
+    var isLoggedIn =
+        isAdminLoggedIn || isCustomerLoggedIn;
 }
 
 <style>
@@ -74,89 +84,216 @@
     }
 </style>
 
+
+<!-- ========================================= -->
+<!-- HERO -->
+<!-- ========================================= -->
+
 <section class="home-hero">
-    <div class="home-actions">
-        <a asp-controller="Home" asp-action="Customer" class="btn btn-dark">CUSTOMER</a>
-        <a asp-controller="Admin" asp-action="Login" class="btn btn-outline-dark">ADMIN</a>
-    </div>
+
+    @if (!isLoggedIn)
+    {
+        <div class="home-actions">
+
+            <a asp-controller="Home"
+               asp-action="Customer"
+               class="btn btn-dark">
+                CUSTOMER
+            </a>
+
+            <a asp-controller="Admin"
+               asp-action="Login"
+               class="btn btn-outline-dark">
+                ADMIN
+            </a>
+
+        </div>
+    }
+
 
     <div>
-        <p class="text-uppercase small mb-2">Pearls & More Bridal Fashion</p>
-        <h1>Your Perfect Look Awaits</h1>
+
+        <p class="text-uppercase small mb-2">
+            Pearls & More Bridal Fashion
+        </p>
+
+        <h1>
+            Your Perfect Look Awaits
+        </h1>
+
         <p>
             Browse our clothing collection, make an online reservation,
             and complete your rental and payment at the boutique.
         </p>
-        <a href="#categories" class="btn btn-dark">VIEW COLLECTION</a>
+
+        <a href="#categories"
+           class="btn btn-dark">
+            VIEW COLLECTION
+        </a>
+
     </div>
+
 </section>
 
+
+<!-- ========================================= -->
+<!-- COLLECTION -->
+<!-- ========================================= -->
+
 <section class="home-section text-center">
-    <p class="text-muted mb-2">PEARLS & MORE</p>
-    <h2>Our Collection</h2>
+
+    <p class="text-muted mb-2">
+        PEARLS & MORE
+    </p>
+
+    <h2>
+        Our Collection
+    </h2>
+
     <p class="text-muted">
         Select a category to see the items available for rental.
     </p>
 
-    <div id="categories" class="row g-4 mt-3">
+
+    <div id="categories"
+         class="row g-4 mt-3">
+
         @if (Model.Any())
         {
             foreach (var category in Model)
             {
-                var name = (category.CatName ?? "").ToLower();
-                var image = name.Contains("suit") || name.Contains("tux") || name.Contains("barong")
+                var name =
+                    (category.CatName ?? "").ToLower();
+
+                var image =
+                    name.Contains("suit") ||
+                    name.Contains("tux") ||
+                    name.Contains("barong")
                     ? "/Images/suit4.jpg"
                     : "/Images/gown4.jpg";
 
+
                 <div class="col-md-6 col-lg-4">
+
                     <div class="category-card">
-                        <img src="@image" alt="@category.CatName" />
+
+                        <img src="@image"
+                             alt="@category.CatName" />
+
+
                         <div class="content text-start">
-                            <h4>@category.CatName</h4>
-                            <p class="text-muted">Browse items in this category.</p>
+
+                            <h4>
+                                @category.CatName
+                            </h4>
+
+                            <p class="text-muted">
+                                Browse items in this category.
+                            </p>
+
                             <a asp-action="Category"
                                asp-route-id="@category.CatID"
                                class="btn btn-outline-dark">
+
                                 VIEW ITEMS
+
                             </a>
+
                         </div>
+
                     </div>
+
                 </div>
             }
         }
         else
         {
             <div class="col-12">
-                <p class="text-muted">No categories have been added yet.</p>
+
+                <p class="text-muted">
+                    No categories have been added yet.
+                </p>
+
             </div>
         }
+
     </div>
+
 </section>
 
+
+<!-- ========================================= -->
+<!-- HOW IT WORKS -->
+<!-- ========================================= -->
+
 <section class="how-section">
+
     <div class="container">
+
         <div class="text-center mb-4">
-            <h2>How It Works</h2>
+
+            <h2>
+                How It Works
+            </h2>
+
         </div>
+
 
         <div class="row">
-            <div class="col-md-4 step">
-                <div class="step-number">01</div>
-                <h4>Browse</h4>
-                <p class="text-muted">Choose from the available categories and items.</p>
-            </div>
 
             <div class="col-md-4 step">
-                <div class="step-number">02</div>
-                <h4>Book Online</h4>
-                <p class="text-muted">Reserve your selected item online.</p>
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <h4>
+                    Browse
+                </h4>
+
+                <p class="text-muted">
+                    Choose from the available categories and items.
+                </p>
+
             </div>
 
+
             <div class="col-md-4 step">
-                <div class="step-number">03</div>
-                <h4>Visit & Pay</h4>
-                <p class="text-muted">Visit the boutique, pay physically, and receive the rental.</p>
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <h4>
+                    Book Online
+                </h4>
+
+                <p class="text-muted">
+                    Reserve your selected item online.
+                </p>
+
             </div>
+
+
+            <div class="col-md-4 step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <h4>
+                    Visit & Pay
+                </h4>
+
+                <p class="text-muted">
+                    Visit the boutique, pay physically,
+                    and receive the rental.
+                </p>
+
+            </div>
+
         </div>
+
     </div>
+
 </section>

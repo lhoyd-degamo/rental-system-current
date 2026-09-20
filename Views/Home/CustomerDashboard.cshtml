@@ -1,154 +1,696 @@
 @model IEnumerable<CRUD.Models.Borrow>
 @using CRUD.Models
+
 @{
     ViewData["Title"] = "Customer Dashboard";
-    var customer = ViewBag.Customer as Customer;
-    var items = ViewBag.AvailableItems as IEnumerable<Item> ?? Enumerable.Empty<Item>();
+
+    var customer =
+        ViewBag.Customer as Customer;
+
+    var items =
+        ViewBag.AvailableItems as IEnumerable<Item>
+        ?? Enumerable.Empty<Item>();
+
+    var cartCount =
+        ViewBag.CartCount ?? 0;
 }
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <div>
-            <h1 class="mb-1">Customer Dashboard</h1>
-            <p class="text-muted mb-0">Welcome, @customer?.CustomerName</p>
-        </div>
-        <a asp-action="CustomerLogout" class="btn btn-outline-secondary">Logout</a>
-    </div>
+<style>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+    .dashboard-hero {
+        background: #f3f3f3;
+        border: 1px solid #ddd;
+        padding: 35px;
+        margin-bottom: 35px;
     }
 
-    <div class="card border mb-4">
-        <div class="card-body">
-            <h5>My Information</h5>
-            <div class="row mt-3">
-                <div class="col-md-3"><strong>Name</strong><br />@customer?.CustomerName</div>
-                <div class="col-md-3"><strong>Email</strong><br />@customer?.Email</div>
-                <div class="col-md-3"><strong>Phone</strong><br />@customer?.PhoneNumber</div>
-                <div class="col-md-3"><strong>Address</strong><br />@customer?.Address</div>
+    .dashboard-hero h1 {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .info-card {
+        border: 1px solid #ddd;
+        background: #fff;
+        margin-bottom: 45px;
+    }
+
+    .info-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .info-body {
+        padding: 25px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #777;
+        letter-spacing: .5px;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-weight: 500;
+    }
+
+    .section-heading {
+        margin-bottom: 25px;
+    }
+
+    .section-heading h2 {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .section-heading p {
+        color: #777;
+        margin: 0;
+    }
+
+    .item-card {
+        border: 1px solid #ddd;
+        background: #fff;
+        height: 100%;
+        transition: .2s ease;
+    }
+
+    .item-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 18px rgba(0,0,0,.08);
+    }
+
+    .item-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        background: #eee;
+    }
+
+    .item-body {
+        padding: 20px;
+    }
+
+    .item-category {
+        color: #777;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .item-name {
+        margin-top: 5px;
+        margin-bottom: 8px;
+    }
+
+    .item-description {
+        color: #777;
+        font-size: 14px;
+        min-height: 42px;
+    }
+
+    .item-price {
+        font-size: 20px;
+        font-weight: 600;
+        margin-top: 12px;
+    }
+
+    .booking-section {
+        margin-top: 60px;
+        padding-bottom: 50px;
+    }
+
+    .booking-table {
+        border: 1px solid #ddd;
+        background: #fff;
+    }
+
+    .booking-table th {
+        white-space: nowrap;
+    }
+
+    .booking-table td {
+        vertical-align: middle;
+    }
+
+    .empty-box {
+        border: 1px solid #ddd;
+        background: #fafafa;
+        padding: 50px 20px;
+        text-align: center;
+    }
+
+</style>
+
+
+<div class="container py-5">
+
+    <!-- ===================================================== -->
+    <!-- DASHBOARD HEADER -->
+    <!-- ===================================================== -->
+
+    <div class="dashboard-hero">
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    flex-wrap
+                    gap-3">
+
+            <div>
+
+                <div class="text-muted
+                            small
+                            text-uppercase
+                            mb-2">
+
+                    Pearls & More Bridal Fashion
+
+                </div>
+
+                <h1>
+                    Customer Dashboard
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Welcome, @customer?.CustomerName
+                </p>
+
             </div>
+
+
+            <div class="d-flex gap-2">
+
+                <!-- BOOKING CART -->
+
+                <a asp-controller="Home"
+                   asp-action="BookingCart"
+                   class="btn btn-dark">
+
+                    🛒 Booking Cart
+
+                    @if (cartCount > 0)
+                    {
+                        <span class="badge bg-light text-dark ms-1">
+                            @cartCount
+                        </span>
+                    }
+
+                </a>
+
+
+                <!-- LOGOUT -->
+
+                <a asp-action="CustomerLogout"
+                   class="btn btn-outline-dark"
+                   onclick="return confirm('Do you want to log out?');">
+
+                    Logout
+
+                </a>
+
+            </div>
+
         </div>
+
     </div>
 
-    <h3 class="mb-3">Available Items</h3>
 
-    <div class="row g-3 mb-5">
-        @foreach (var item in items)
+    <!-- ===================================================== -->
+    <!-- CART SUCCESS -->
+    <!-- ===================================================== -->
+
+    @if (TempData["CartSuccess"] != null)
+    {
+        <div class="alert alert-success">
+
+            @TempData["CartSuccess"]
+
+            <a asp-controller="Home"
+               asp-action="BookingCart"
+               class="alert-link ms-2">
+
+                View Booking Cart
+
+            </a>
+
+        </div>
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- CART ERROR -->
+    <!-- ===================================================== -->
+
+    @if (TempData["CartError"] != null)
+    {
+        <div class="alert alert-danger">
+
+            @TempData["CartError"]
+
+        </div>
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- BOOKING SUCCESS -->
+    <!-- ===================================================== -->
+
+    @if (TempData["BookingSuccess"] != null)
+    {
+        <div class="alert alert-success">
+
+            @TempData["BookingSuccess"]
+
+        </div>
+    }
+
+
+    <!-- ===================================================== -->
+    <!-- CUSTOMER INFORMATION -->
+    <!-- ===================================================== -->
+
+    <div class="info-card">
+
+        <div class="info-header">
+
+            <h4 class="mb-0">
+                My Information
+            </h4>
+
+        </div>
+
+
+        <div class="info-body">
+
+            <div class="row g-4">
+
+                <div class="col-md-3">
+
+                    <div class="info-label">
+                        Name
+                    </div>
+
+                    <div class="info-value">
+                        @customer?.CustomerName
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="info-label">
+                        Email
+                    </div>
+
+                    <div class="info-value">
+                        @customer?.Email
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="info-label">
+                        Phone
+                    </div>
+
+                    <div class="info-value">
+                        @customer?.PhoneNumber
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="info-label">
+                        Address
+                    </div>
+
+                    <div class="info-value">
+                        @customer?.Address
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- AVAILABLE ITEMS -->
+    <!-- ===================================================== -->
+
+    <section id="available-items">
+
+        <div class="section-heading">
+
+            <h2>
+                Available Items
+            </h2>
+
+            <p>
+                Select multiple items to add to your booking cart.
+            </p>
+
+        </div>
+
+
+        @if (items.Any())
         {
-            var image = $"/Images/Items/{item.CatID}/{item.ItemCode}.jpg";
-            var fallback = (item.Category?.CatName ?? "").ToLower().Contains("suit") ||
-                           (item.Category?.CatName ?? "").ToLower().Contains("tux") ||
-                           (item.Category?.CatName ?? "").ToLower().Contains("barong")
-                ? "/Images/suit4.jpg"
-                : "/Images/gown4.jpg";
+            <div class="row g-4">
 
-            <div class="col-sm-6 col-lg-4 col-xl-3">
-                <div class="card border h-100 overflow-hidden">
-                    <img src="@image"
-                         alt="@item.ItemName"
-                         style="width:100%;height:260px;object-fit:cover;"
-                         onerror="this.onerror=null;this.src='@fallback';" />
-                    <div class="card-body">
-                        <small class="text-muted">@item.Category?.CatName</small>
-                        <h5 class="mt-1">@item.ItemName</h5>
-                        <div>Size: @item.Size</div>
-                        <div class="mt-2"><strong>₱@item.Amount.ToString("N2")</strong></div>
-                        <div class="mt-2">
-                            @if (item.Quantity > 0 && item.Status == "Available")
-                            {
-                                <span class="badge bg-success">Available</span>
-                                <span class="text-muted small"> Stock: @item.Quantity</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Unavailable</span>
-                            }
+                @foreach (var item in items)
+                {
+                    var image =
+                        string.IsNullOrWhiteSpace(item.ImagePath)
+                        ? "/Images/gown4.jpg"
+                        : item.ImagePath;
+
+
+                    <div class="col-sm-6
+                                col-lg-4
+                                col-xl-3">
+
+                        <div class="item-card">
+
+                            <!-- ITEM IMAGE -->
+
+                            <img src="@image"
+                                 alt="@item.ItemName"
+                                 class="item-image"
+                                 onerror="
+                                    this.onerror=null;
+                                    this.src='/Images/gown4.jpg';
+                                 " />
+
+
+                            <!-- ITEM BODY -->
+
+                            <div class="item-body">
+
+                                <div class="item-category">
+                                    @item.Category?.CatName
+                                </div>
+
+
+                                <h4 class="item-name">
+                                    @item.ItemName
+                                </h4>
+
+
+                                <p class="item-description">
+                                    @item.Description
+                                </p>
+
+
+                                <div>
+
+                                    <span class="text-muted">
+                                        Size:
+                                    </span>
+
+                                    <strong>
+                                        @item.Size
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="item-price">
+                                    ₱@item.Amount.ToString("N2")
+                                </div>
+
+
+                                <div class="mt-2">
+
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+
+                                    <span class="text-muted small ms-1">
+                                        @item.Quantity in stock
+                                    </span>
+
+                                </div>
+
+
+                                <!-- VIEW ITEM -->
+
+                                <a asp-controller="Home"
+                                   asp-action="ItemDetails"
+                                   asp-route-id="@item.ItemID"
+                                   class="btn btn-outline-dark
+                                          w-100
+                                          mt-4">
+
+                                    VIEW ITEM
+
+                                </a>
+
+
+                                <!-- BOOK ITEM -->
+
+                                <a asp-controller="Home"
+                                   asp-action="AddToCart"
+                                   asp-route-id="@item.ItemID"
+                                   class="btn btn-dark
+                                          w-100
+                                          mt-2">
+
+                                    BOOK ITEM
+
+                                </a>
+
+                            </div>
+
                         </div>
 
-                        @if (item.Quantity > 0 && item.Status == "Available")
-                        {
-                            <a asp-controller="Borrow"
-                               asp-action="Book"
-                               asp-route-itemId="@item.ItemID"
-                               class="btn btn-dark w-100 mt-3">
-                                BOOK ITEM
-                            </a>
-                        }
-                        else
-                        {
-                            <button class="btn btn-light w-100 mt-3" disabled>UNAVAILABLE</button>
-                        }
                     </div>
-                </div>
+                }
+
             </div>
         }
-    </div>
+        else
+        {
+            <div class="empty-box">
 
-    <h3 class="mb-3">My Bookings</h3>
+                <h4>
+                    No items available
+                </h4>
 
-    @if (Model.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered bg-white">
-                <thead class="table-light">
-                    <tr>
-                        <th>Booking</th>
-                        <th>Item</th>
-                        <th>Borrow Date</th>
-                        <th>Return Date</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var booking in Model)
-                    {
-                        <tr>
-                            <td>#@booking.BorrowID</td>
-                            <td>
-                                @foreach (var bi in booking.BorrowItems)
-                                {
-                                    <div>@bi.Item?.ItemName</div>
-                                }
-                            </td>
-                            <td>@booking.BorrowDate.ToString("MM/dd/yyyy")</td>
-                            <td>@booking.ReturnDate.ToString("MM/dd/yyyy")</td>
-                            <td>
-                                @if (booking.Status == "Booked")
-                                {
-                                    <span class="badge bg-warning text-dark">Booked</span>
-                                }
-                                else if (booking.Status == "Borrowed")
-                                {
-                                    <span class="badge bg-primary">Borrowed</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success">Returned</span>
-                                }
-                            </td>
-                            <td>
-                                <a asp-controller="Payment"
-                                   asp-action="OrderQR"
-                                   asp-route-id="@booking.BorrowID"
-                                   class="btn btn-sm btn-outline-dark">
-                                    ORDER / QR
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                <p class="text-muted">
+                    There are currently no available items for rental.
+                </p>
+
+            </div>
+        }
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- MY BOOKINGS -->
+    <!-- ===================================================== -->
+
+    <section class="booking-section">
+
+        <div class="section-heading">
+
+            <h2>
+                My Bookings
+            </h2>
+
+            <p>
+                Your confirmed rental bookings.
+            </p>
+
         </div>
-    }
-    else
-    {
-        <div class="alert alert-light border">You do not have any bookings yet.</div>
-    }
+
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table
+                              table-bordered
+                              booking-table
+                              align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                Booking
+                            </th>
+
+                            <th>
+                                Items
+                            </th>
+
+                            <th>
+                                Borrow Date
+                            </th>
+
+                            <th>
+                                Return Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var booking in Model)
+                        {
+                            <tr>
+
+                                <!-- BOOKING ID -->
+
+                                <td>
+                                    <strong>
+                                        #@booking.BorrowID
+                                    </strong>
+                                </td>
+
+
+                                <!-- ITEMS -->
+
+                                <td>
+
+                                    @if (booking.BorrowItems != null &&
+                                         booking.BorrowItems.Any())
+                                    {
+                                        foreach (var borrowItem in booking.BorrowItems)
+                                        {
+                                            <div>
+                                                @borrowItem.Item?.ItemName
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No items
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- BORROW DATE -->
+                                <!-- IMPORTANT: Keep ToString on the same Razor expression -->
+
+                                <td>
+                                    @booking.BorrowDate.ToString("MM/dd/yyyy")
+                                </td>
+
+
+                                <!-- RETURN DATE -->
+                                <!-- IMPORTANT: Keep ToString on the same Razor expression -->
+
+                                <td>
+                                    @booking.ReturnDate.ToString("MM/dd/yyyy")
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (booking.Status == "Booked")
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Booked
+                                        </span>
+                                    }
+                                    else if (booking.Status == "Borrowed")
+                                    {
+                                        <span class="badge bg-primary">
+                                            Borrowed
+                                        </span>
+                                    }
+                                    else if (booking.Status == "Returned")
+                                    {
+                                        <span class="badge bg-success">
+                                            Returned
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            @booking.Status
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    <a asp-controller="Payment"
+                                       asp-action="OrderQR"
+                                       asp-route-id="@booking.BorrowID"
+                                       class="btn btn-sm btn-outline-dark">
+
+                                        ORDER / QR
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-box">
+
+                <h4>
+                    No bookings yet
+                </h4>
+
+                <p class="text-muted">
+                    Your confirmed bookings will appear here.
+                </p>
+
+                <a href="#available-items"
+                   class="btn btn-dark">
+
+                    BROWSE ITEMS
+
+                </a>
+
+            </div>
+        }
+
+    </section>
+
 </div>

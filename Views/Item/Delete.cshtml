@@ -1,31 +1,171 @@
 ﻿@model CRUD.Models.Item
 
-<h2>Delete Item</h2>
+@{
+    ViewData["Title"] = "Delete Item";
+}
 
-<h4>Are you sure you want to delete this item?</h4>
+<div class="container-fluid py-4">
 
-<hr />
-
-
-<p><strong>ID:</strong> @Model.ItemID</p>
-<p><strong>Item Code:</strong> @Model.ItemCode</p>
-<p><strong>Name:</strong> @Model.ItemName</p>
-<p><strong>Description:</strong> @Model.Description</p>
-
-<p><strong>Amount:</strong> @Model.Amount</p>
-
-<p><strong>Category ID:</strong> @Model.Category</p>
-
-<form asp-action="Delete" method="post">
-
-    <input type="hidden" asp-for="ItemID" />
-
-    <button type="submit" class="btn btn-danger">
-        Delete
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        Cancel
+    <a asp-action="Index"
+       class="btn btn-outline-secondary mb-4">
+        Back to Items
     </a>
 
-</form>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h2>
+                        Delete Item
+                    </h2>
+
+                    <p class="text-muted">
+                        Are you sure you want to delete this item?
+                    </p>
+
+                    <hr />
+
+
+                    <div class="row g-4">
+
+                        <!-- IMAGE -->
+
+                        <div class="col-md-4">
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                Model.ImagePath))
+                            {
+                                <img src="@Model.ImagePath"
+                                     alt="@Model.ItemName"
+                                     style="
+                                        width:100%;
+                                        height:350px;
+                                        object-fit:cover;
+                                        border-radius:8px;
+                                        border:1px solid #ddd;" />
+                            }
+                            else
+                            {
+                                <div style="
+                                    width:100%;
+                                    height:350px;
+                                    background:#f5f5f5;
+                                    border:1px solid #ddd;
+                                    border-radius:8px;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;">
+
+                                    <span class="text-muted">
+                                        No Image
+                                    </span>
+
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <!-- DETAILS -->
+
+                        <div class="col-md-8">
+
+                            <p>
+                                <strong>ID:</strong>
+                                @Model.ItemID
+                            </p>
+
+                            <p>
+                                <strong>Item Code:</strong>
+                                @Model.ItemCode
+                            </p>
+
+                            <p>
+                                <strong>Name:</strong>
+                                @Model.ItemName
+                            </p>
+
+                            <p>
+                                <strong>Description:</strong>
+                                @Model.Description
+                            </p>
+
+                            <p>
+                                <strong>Amount:</strong>
+                                ₱@Model.Amount.ToString("N2")
+                            </p>
+
+                            <p>
+                                <strong>Size:</strong>
+                                @Model.Size
+                            </p>
+
+                            <p>
+                                <strong>Quantity:</strong>
+                                @Model.Quantity
+                            </p>
+
+                            <p>
+                                <strong>Category:</strong>
+                                @Model.Category?.CatName
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                @Model.Status
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <div class="alert alert-warning">
+
+                        <strong>Warning:</strong>
+
+                        Deleting this item will permanently remove
+                        the item and its uploaded image.
+
+                    </div>
+
+
+                    <form asp-action="Delete"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               asp-for="ItemID" />
+
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Delete
+                        </button>
+
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
